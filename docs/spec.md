@@ -18,8 +18,11 @@ month. See `docs/domain.md` for the real case behind it.
 
 ## The monthly run **[decided]**
 
-Raw input: a folder of invoice PDFs for the month, the card or bank charges
-(CSV), and the supplier registry.
+Raw input: invoices collected from three channels, in this order: email,
+the supplier's billing API when it has one, and browser automation of the
+supplier's dashboard as a fallback. Plus the card or bank charges (CSV) and
+the supplier registry. In the demo all three channels run on synthetic
+sources (see `docs/contracts.md`).
 
 1. **Extract** from each PDF: supplier, country, tax identifier, invoice
    number and date, amount, currency, addressee and addressee VAT number,

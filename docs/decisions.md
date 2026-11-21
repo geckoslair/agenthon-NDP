@@ -18,10 +18,20 @@ it is not decided; ask the humans.
 | Credits                      | Each member uses their own Google and ElevenLabs credits and keys, in a local `.env`                                                                                                                                   |
 | Agent docs                   | `AGENTS.md` is the single source; `CLAUDE.md` imports it                                                                                                                                                               |
 
+## Decided (21 November 2026, afternoon)
+
+- **Project name:** Probata (domain probata.it, DNS configured later).
+- **Invoice collection:** three channels in order: email, the supplier's
+  billing API, browser automation (Playwright) as fallback. All on synthetic
+  sources in the demo.
+- **Interface:** shadcn components styled with `docs/design.md`.
+- **Hosting:** a Railway project in the Piramid workspace.
+- **Orchestration:** three parallel agent streams with the ownership and
+  interfaces in `docs/contracts.md`.
+
 ## Open
 
 - Where ElevenLabs fits in the product.
-- Project name (finalists pitch in reverse alphabetical order).
 - How to frame the business case: the measured cost for one studio is low
   (see `docs/domain.md`).
 
