@@ -29,6 +29,7 @@ import {
   supplierRequestEmail,
 } from "../research";
 import { accountantEmail } from "../package";
+import { generateSelfInvoices } from "../compliance";
 import { buildPackage, collectedDir, refreshPackage } from "./repackage";
 import { EU_COUNTRIES, EXCEPTION_TEXT } from "./messages";
 import { parseCharges } from "./charges";
@@ -583,6 +584,14 @@ export async function runMonth(
     attachmentPath: zipPath,
   });
 
+  // Simulated self-invoice drafts for the valid invoices; they wait for a person too.
+  try {
+    const drafts = generateSelfInvoices(db, runId, dataDir);
+    log("self_invoices_drafted", `run:${runId}`, `${drafts} autofatture simulate in bozza`, null);
+  } catch (error) {
+    warn(`Bozze di autofattura non generate: ${(error as Error).message}`, "compliance");
+  }
+
   db.prepare(
     "UPDATE runs SET status = 'waiting_approval', finished_at = datetime('now') WHERE id = ?",
   ).run(runId);
@@ -665,7 +674,10 @@ export function resolveException(
     packageChanged = true;
   }
   // The package visibly follows the person's decision, while it still waits for approval.
-  if (packageChanged) refreshPackage(db, row.run_id, person);
+  if (packageChanged) {
+    refreshPackage(db, row.run_id, person);
+    generateSelfInvoices(db, row.run_id);
+  }
   return true;
 }
 
@@ -676,6 +688,7 @@ export function resetDemo(db: Db, options: { demoDir?: string; month?: string } 
   const monthDir = path.join(demoDir, month);
   db.transaction(() => {
     for (const table of [
+      "self_invoices",
       "exceptions",
       "outbox",
       "card_charges",
