@@ -10,9 +10,9 @@
     "page": 1
   },
   "supplierTaxId": {
-    "value": null,
-    "quote": null,
-    "page": null
+    "value": "99-9999993",
+    "quote": "EIN: 99-9999993",
+    "page": 1
   },
   "invoiceNumber": {
     "value": "ST-3302",

@@ -240,8 +240,8 @@ const SELLERS: SellerSpec[] = [
     countryName: "United States",
     countryCode: "US",
     taxLabel: "EIN",
-    taxId: null,
-    printTaxId: false,
+    taxId: "99-9999993",
+    printTaxId: true,
     email: "billing@sable-tools.example",
     accent: "#000000",
     layout: "mono",
@@ -316,7 +316,7 @@ export const INVOICES: InvoiceSpec[] = [
   // DUPLICATE: the same invoice received twice (reminder email with the same PDF).
   inv({
     seller: "nimbus",
-    fileName: "nimbus-INV-1001-copy.pdf",
+    fileName: "nimbus-INV-1001b.pdf",
     number: "INV-1001",
     date: "2026-10-02",
     lines: [
@@ -502,7 +502,7 @@ export const EXPECTED: { fileName: string | null; code: ExceptionCode; supplierI
   { fileName: "cobalt-CCI-55021.pdf", code: "ADDRESSED_TO_PERSON" },
   { fileName: "vesper-VC-26-1037.pdf", code: "WRONG_MONTH" },
   { fileName: "rivolta-FT-118.pdf", code: "NOT_FOREIGN" },
-  { fileName: "nimbus-INV-1001-copy.pdf", code: "DUPLICATE" },
+  { fileName: "nimbus-INV-1001b.pdf", code: "DUPLICATE" },
   { fileName: "tandoor-receipt-2026-10-09.pdf", code: "UNREADABLE_FIELD" },
   { fileName: null, code: "MISSING_EXPECTED_INVOICE", supplierId: "marlow" },
   { fileName: "elowen-EL-007.pdf", code: "OUT_OF_KNOWN_RULES" },
@@ -1047,7 +1047,7 @@ export async function generate(outRoot = path.join(process.cwd(), "demo")): Prom
   }
   // The duplicate is the very same document: share the original bytes.
   const original = rendered.get("nimbus-INV-1001.pdf")!;
-  write("pdf/nimbus-INV-1001-copy.pdf", original.pdf);
+  write("pdf/nimbus-INV-1001b.pdf", original.pdf);
 
   json("company.json", COMPANY);
 
@@ -1065,7 +1065,7 @@ export async function generate(outRoot = path.join(process.cwd(), "demo")): Prom
   const charges: CardCharge[] = [];
   const chargeDate = (iso: string) => (iso.startsWith(MONTH) ? iso : `${MONTH}-01`);
   for (const spec of INVOICES) {
-    if (spec.fileName === "nimbus-INV-1001-copy.pdf") continue;
+    if (spec.fileName === "nimbus-INV-1001b.pdf") continue;
     const seller = SELLERS.find((s) => s.id === spec.seller)!;
     const r = rendered.get(spec.fileName)!;
     const city =
@@ -1154,12 +1154,12 @@ Supplier id = file name prefix before the first "-". Tax ids are fake.
 | cobalt-CCI-55021.pdf | ADDRESSED_TO_PERSON (browser channel) |
 | vesper-VC-26-1037.pdf | WRONG_MONTH (dated 2026-09-30) |
 | rivolta-FT-118.pdf | NOT_FOREIGN (Italian supplier) |
-| nimbus-INV-1001-copy.pdf | DUPLICATE of nimbus-INV-1001.pdf |
+| nimbus-INV-1001b.pdf | DUPLICATE of nimbus-INV-1001.pdf |
 | tandoor-receipt-2026-10-09.pdf | UNREADABLE_FIELD (no invoice number printed) |
 | (none) | MISSING_EXPECTED_INVOICE: marlow, recurring, card charge c-MARLOW with no invoice |
 | elowen-EL-007.pdf | OUT_OF_KNOWN_RULES (private individual outside the EU, no tax id) |
 | helix-HX-90017.pdf | Unknown supplier, researchable: /mock/portal/helix/billing-info states the facts. No exception expected |
-| sable-ST-3302.pdf | Unknown supplier, not researchable: page omits tax id and VAT treatment. SUPPLIER_FACTS_UNKNOWN |
+| sable-ST-3302.pdf | Unknown supplier, not researchable: the invoice prints an EIN but its page omits tax id and VAT treatment, so the VAT treatment stays unknown. SUPPLIER_FACTS_UNKNOWN |
 
 Vesper issues five invoices in the month (expected: 5). Channels: email for
 most, billing API for orbit and quill, browser portal for glyph and cobalt.

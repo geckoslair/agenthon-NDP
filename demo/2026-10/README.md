@@ -11,12 +11,12 @@ Supplier id = file name prefix before the first "-". Tax ids are fake.
 | cobalt-CCI-55021.pdf | ADDRESSED_TO_PERSON (browser channel) |
 | vesper-VC-26-1037.pdf | WRONG_MONTH (dated 2026-09-30) |
 | rivolta-FT-118.pdf | NOT_FOREIGN (Italian supplier) |
-| nimbus-INV-1001-copy.pdf | DUPLICATE of nimbus-INV-1001.pdf |
+| nimbus-INV-1001b.pdf | DUPLICATE of nimbus-INV-1001.pdf |
 | tandoor-receipt-2026-10-09.pdf | UNREADABLE_FIELD (no invoice number printed) |
 | (none) | MISSING_EXPECTED_INVOICE: marlow, recurring, card charge c-MARLOW with no invoice |
 | elowen-EL-007.pdf | OUT_OF_KNOWN_RULES (private individual outside the EU, no tax id) |
 | helix-HX-90017.pdf | Unknown supplier, researchable: /mock/portal/helix/billing-info states the facts. No exception expected |
-| sable-ST-3302.pdf | Unknown supplier, not researchable: page omits tax id and VAT treatment. SUPPLIER_FACTS_UNKNOWN |
+| sable-ST-3302.pdf | Unknown supplier, not researchable: the invoice prints an EIN but its page omits tax id and VAT treatment, so the VAT treatment stays unknown. SUPPLIER_FACTS_UNKNOWN |
 
 Vesper issues five invoices in the month (expected: 5). Channels: email for
 most, billing API for orbit and quill, browser portal for glyph and cobalt.
