@@ -68,6 +68,9 @@ export interface SourceContext {
 
 const ACTOR = "autopilot";
 
+/** Exception codes the pipeline no longer raises; old rows are ignored everywhere. */
+export const RETIRED_EXCEPTION_CODES: readonly string[] = ["MISSING_EXPECTED_INVOICE"];
+
 /**
  * A card charge description ("ORBIT ANALYTICS DUBLIN IE") belongs to a supplier when it
  * contains the supplier id or the first word of its name.
@@ -536,34 +539,14 @@ export async function runMonth(
     registry,
     charges,
   );
-  const missingSuppliers = new Set<string>();
-  for (const m of completeness.missingFromSuppliers) {
-    missingSuppliers.add(m.supplier.id);
-    const related = completeness.unmatchedCharges.filter((c) =>
-      chargeMatchesSupplier(c.description, m.supplier),
-    );
-    const chargeText = related.map(
-      (c) => `addebito ${c.date} ${c.description} ${c.amount} ${c.currency}`,
-    );
-    raise(
-      "MISSING_EXPECTED_INVOICE",
-      null,
-      m.supplier.id,
-      [`${m.supplier.name}: attese ${m.expected}, ricevute ${m.received}`, ...chargeText].join(
-        "; ",
-      ),
-    );
-  }
-  for (const c of completeness.unmatchedCharges) {
-    const s = registry.find((x) => chargeMatchesSupplier(c.description, x)) ?? null;
-    if (s && missingSuppliers.has(s.id)) continue;
-    raise(
-      "MISSING_EXPECTED_INVOICE",
-      null,
-      s?.id ?? null,
-      `Addebito senza fattura: ${c.date} ${c.description} ${c.amount} ${c.currency}`,
-    );
-  }
+  // MISSING_EXPECTED_INVOICE is retired: reconciliation is recorded in the log only,
+  // it never raises an exception.
+  log(
+    "completeness_checked",
+    `run:${runId}`,
+    `Fornitori ricorrenti senza fattura: ${completeness.missingFromSuppliers.length}; addebiti carta senza fattura: ${completeness.unmatchedCharges.length} (solo informativo)`,
+    null,
+  );
 
   // Invoice status follows its open exceptions.
   const setStatus = db.prepare("UPDATE invoices SET status = ? WHERE id = ?");
@@ -602,7 +585,9 @@ export async function runMonth(
   ).run(runId);
   const exceptions = (
     db
-      .prepare("SELECT COUNT(*) AS n FROM exceptions WHERE run_id = ? AND status = 'open'")
+      .prepare(
+        "SELECT COUNT(*) AS n FROM exceptions WHERE run_id = ? AND status = 'open' AND code <> 'MISSING_EXPECTED_INVOICE'",
+      )
       .get(runId) as { n: number }
   ).n;
   const pendingApprovals = (
@@ -732,3 +717,5 @@ export {
 } from "./delivery";
 
 export { completeUnreadableFields, unreadableFields, MANUAL_FIELDS } from "./manual-fields";
+
+export { excludeInvoice } from "./workflow";

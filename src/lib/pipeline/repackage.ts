@@ -73,13 +73,7 @@ export function packageContents(db: Db, runId: number): PackageContents {
       pending += 1;
     }
   }
-  const missing = db
-    .prepare(
-      `SELECT DISTINCT s.name FROM exceptions e JOIN suppliers s ON s.id = e.supplier_id
-       WHERE e.run_id = ? AND e.code = 'MISSING_EXPECTED_INVOICE' AND e.status = 'open'`,
-    )
-    .all(runId) as { name: string }[];
-  for (const m of missing) entry(m.name).toReceive = true;
+  // MISSING_EXPECTED_INVOICE is retired: no "DA RICEVERE" notes from old rows.
   return { entries: [...entries.values()], fileNames, pending };
 }
 

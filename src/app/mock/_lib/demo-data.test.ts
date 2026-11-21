@@ -90,9 +90,10 @@ describe("demo data generator", () => {
       );
     for (const e of expected) expect(CODES).toContain(e.code);
     expect(new Set(expected.map((e) => e.code)).size).toBe(expected.length);
-    expect(expected.map((e) => e.code).sort()).toEqual([...CODES].sort());
-    const missing = expected.find((e) => e.code === "MISSING_EXPECTED_INVOICE");
-    expect(missing).toMatchObject({ fileName: null, supplierId: "marlow" });
+    // MISSING_EXPECTED_INVOICE is retired: the pipeline no longer raises it.
+    expect(expected.map((e) => e.code).sort()).toEqual(
+      CODES.filter((c) => c !== "MISSING_EXPECTED_INVOICE").sort(),
+    );
     for (const e of expected) if (e.fileName) expect(pdfs()).toContain(e.fileName);
   });
 

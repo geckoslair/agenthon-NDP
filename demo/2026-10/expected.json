@@ -24,11 +24,6 @@
     "code": "UNREADABLE_FIELD"
   },
   {
-    "fileName": null,
-    "code": "MISSING_EXPECTED_INVOICE",
-    "supplierId": "marlow"
-  },
-  {
     "fileName": "elowen-EL-007.pdf",
     "code": "OUT_OF_KNOWN_RULES"
   },

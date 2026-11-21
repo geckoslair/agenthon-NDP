@@ -41,7 +41,6 @@ describe("runMonth on fixtures", () => {
       .sort();
     expect(got).toEqual(
       [
-        "glyph:MISSING_EXPECTED_INVOICE",
         "nimbus-INV-1001-copy.pdf:DUPLICATE",
         "person-5.pdf:ADDRESSED_TO_PERSON",
         "shadow-9.pdf:SUPPLIER_FACTS_UNKNOWN",
@@ -61,7 +60,7 @@ describe("runMonth on fixtures", () => {
   it("collects from email and the billing API, and waits for approval", async () => {
     const { db, summary } = await run();
     expect(summary.invoices).toBe(7);
-    expect(summary.exceptions).toBe(5);
+    expect(summary.exceptions).toBe(4);
     const run_ = db.prepare("SELECT status FROM runs WHERE id = ?").get(summary.runId) as {
       status: string;
     };
@@ -125,7 +124,7 @@ describe("runMonth on fixtures", () => {
     };
     expect(pkg.subject).toBe("Acme Studio SRL | Acquisti esteri Ottobre 2026");
     expect(pkg.body).toContain("3 fatture in totale");
-    expect(pkg.body).toContain("Glyph Fonts AB (DA RICEVERE)");
+    expect(pkg.body).not.toContain("DA RICEVERE");
     expect(pkg.body).toContain("Vatco GmbH (1 in verifica)");
   });
 
@@ -144,7 +143,7 @@ describe("runMonth on fixtures", () => {
     });
     expect(summary.warnings.some((w) => w.includes("orbit"))).toBe(true);
     const codes = exceptionsByFile(db).map((e) => `${e.supplierId}:${e.code}`);
-    expect(codes).toContain("orbit:MISSING_EXPECTED_INVOICE");
+    expect(codes).not.toContain("orbit:MISSING_EXPECTED_INVOICE");
     const logged = db
       .prepare("SELECT COUNT(*) AS n FROM audit_log WHERE step = 'warning'")
       .get() as { n: number };

@@ -3,6 +3,7 @@ import { decideOutgoing, markSent } from "../audit";
 import { openDb, type Db } from "../db";
 import { resolveException, runMonth } from "./index";
 import { refreshPackage } from "./repackage";
+import { packageBlockers } from "./delivery";
 import { fakeFetch, LUMEN_PAGE, makeMonth, MONTH } from "./__fixtures__/make-month";
 import fs from "node:fs";
 
@@ -64,16 +65,14 @@ describe("package follows resolutions", () => {
     expect(log.detail).toContain("4 fatture");
   });
 
-  it("drops DA RICEVERE when a person resolves the missing invoice", async () => {
-    const { db } = await run();
-    expect(pkg(db).body).toContain("Glyph Fonts AB (DA RICEVERE)");
-    resolveException(
-      db,
-      exceptionId(db, "MISSING_EXPECTED_INVOICE"),
-      "Non dovuta questo mese",
-      "Anna",
-    );
+  it("ignores retired MISSING_EXPECTED_INVOICE rows already in the database", async () => {
+    const { db, summary } = await run();
+    db.prepare(
+      "INSERT INTO exceptions (run_id, supplier_id, code, message) VALUES (?, 'glyph', 'MISSING_EXPECTED_INVOICE', 'old')",
+    ).run(summary.runId);
+    expect(refreshPackage(db, summary.runId, "Anna")).toBe("updated");
     expect(pkg(db).body).not.toContain("DA RICEVERE");
+    expect(packageBlockers(db, summary.runId)).toHaveLength(1); // only the supplier request
   });
 
   it("keeps a resolved duplicate out of the zip", async () => {
