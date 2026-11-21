@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export function ListenButton() {
+export function ListenButton({ detail = false }: { detail?: boolean }) {
   const audio = useRef<HTMLAudioElement | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "playing">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +17,7 @@ export function ListenButton() {
     setError(null);
     setState("loading");
     try {
-      const res = await fetch("/api/brief/audio");
+      const res = await fetch(detail ? "/api/brief/audio?detail=1" : "/api/brief/audio");
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as { message?: string } | null;
         throw new Error(body?.message ?? "Audio non disponibile. Il brief resta in testo.");
@@ -41,7 +41,9 @@ export function ListenButton() {
           ? "Preparo l'audio…"
           : state === "playing"
             ? "Ferma"
-            : "Ascolta il brief"}
+            : detail
+              ? "Ascolta il dettaglio"
+              : "Ascolta il brief"}
       </Button>
       {error && (
         <p role="status" className="text-sm font-semibold text-bad">

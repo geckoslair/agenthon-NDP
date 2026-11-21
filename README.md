@@ -85,7 +85,7 @@ Google variables in `.env`, and log in with
 
 The overview has a card "Brief del giro": the text is built from the database
 (counts per channel, ready invoices, each open exception, what is missing,
-what waits for approval) and the button **Ascolta il brief** reads it aloud.
+what waits for approval) and the button **Ascolta il brief** reads a 15-second summary aloud (totals, open exceptions by kind, what waits for approval); **Ascolta il dettaglio** reads the full per-invoice text, about a minute.
 It only reads: it approves and sends nothing. Set `ELEVENLABS_API_KEY` in
 `.env`; optional `ELEVENLABS_VOICE_ID` and `ELEVENLABS_MODEL`. Without a key
 the route `/api/brief/audio` answers 503 and the card shows the text only.

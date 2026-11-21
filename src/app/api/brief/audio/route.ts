@@ -1,12 +1,14 @@
 import { getDb } from "@/lib/db";
-import { buildBrief } from "@/lib/voice/brief";
+import { buildBrief, buildShortBrief } from "@/lib/voice/brief";
 import { synthesize, VoiceUnavailableError } from "@/lib/voice/tts";
 
 export const dynamic = "force-dynamic";
 
 // Spoken output only: this route reads the brief and returns audio. It changes nothing.
-export async function GET() {
-  const text = buildBrief(getDb());
+export async function GET(request: Request) {
+  // Short brief by default (about 15 seconds); ?detail=1 reads the full per-invoice text.
+  const detail = new URL(request.url).searchParams.get("detail") === "1";
+  const text = detail ? buildBrief(getDb()) : buildShortBrief(getDb());
   try {
     const { audio, cached } = await synthesize(text);
     return new Response(new Uint8Array(audio), {
