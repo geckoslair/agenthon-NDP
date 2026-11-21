@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { resetDemoAction, runMonthAction } from "@/lib/actions";
 import { getDb } from "@/lib/db";
 import { getOverview, listInvoices } from "@/lib/queries";
+import { VoiceBrief } from "@/components/voice-brief";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -136,6 +137,9 @@ export default function Home() {
               </ActionForm>
             </CardContent>
           </Card>
+        </div>
+        <div className="lg:col-span-2">
+          <VoiceBrief />
         </div>
       </div>
 
