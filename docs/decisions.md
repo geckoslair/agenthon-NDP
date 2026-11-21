@@ -9,9 +9,10 @@ it is not decided; ask the humans.
 | --- | --- |
 | Challenge | B · Back Office Autopilot |
 | Domain | Italian software houses buying from foreign suppliers (passive foreign invoicing) |
-| MVP process | A supplier qualification agent. When a software house prepares a quote for a client and needs external suppliers to cover some features, the agent researches a candidate supplier from external sources and says whether it fits the company's fiscal needs |
-| Role of the real case | The studio described in `docs/domain.md` is evidence of the problem, not the data source of the product. The agent must work for suppliers nobody has used before |
-| Long-term vision (not today) | Automated invoice collection, analysis, split across cost centres, self-invoice and tax obligations |
+| Process | The monthly package of foreign purchase invoices for the accountant, run end to end. Full spec in `docs/spec.md` |
+| Unknown suppliers | When the run meets a supplier with no billing data on file, the agent does not stop: it researches the data on the web and by asking the supplier or the accountant. It raises an exception only if it cannot get them |
+| Role of the real case | The studio in `docs/domain.md` is evidence of the problem. Demo data is synthetic |
+| Long-term vision (not today) | Supplier selection at the quoting stage, self-invoice XML and SdI, split across cost centres |
 | Stack | TypeScript, Node 20, one full-stack app, Prettier, Vitest |
 | Git | Commit straight to `main`, no PRs, quick and dirty |
 | Credits | Each member uses their own Google and ElevenLabs credits and keys, in a local `.env` |
@@ -19,15 +20,14 @@ it is not decided; ask the humans.
 
 ## Open
 
-- **How the agent satisfies Challenge B.** It needs a finished output (not
-  only a verdict), a stop at exceptions, and an approval before something
-  irreversible. Not settled yet.
-- Which facts the agent must establish about a supplier, and from which
-  sources. Every fact must carry its source; no source means "unknown".
+- **Outgoing emails during supplier research**: autonomous, or drafted and
+  approved by a person. The brief requires approval before anything is
+  sent.
 - Framework and persistence for the app.
 - Where ElevenLabs fits in the product.
 - Project name (finalists pitch in reverse alphabetical order).
-- The quantified business case: who loses time or money today, and how much.
+- How to frame the business case: the measured cost for one studio is low
+  (see `docs/domain.md`).
 
 ## Domain facts
 

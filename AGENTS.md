@@ -22,16 +22,16 @@ commit at 17:00; anything pushed later does not count.
 | `docs/credits-google.md` | Vertex AI credits: models, prices, limits, what is not covered |
 | `docs/credits-elevenlabs.md` | ElevenLabs credits and the special prize |
 | `docs/domain.md` | The real-world process, volumes and recurring problems (anonymised) |
+| `docs/spec.md` | What we are building: the run, exceptions, approvals, demo data |
 | `docs/decisions.md` | Decisions taken so far and open questions |
 
-## Product direction (in progress)
+## Product
 
-Italian software houses that buy from foreign suppliers. When a software
-house prepares a quote for a client and needs external suppliers to cover
-some features, a **supplier qualification agent** researches a candidate
-from external sources and says whether it fits the company's fiscal needs
-(invoice addressed to the company, reverse charge, valid tax identifier).
-Details are still open, see `docs/decisions.md`.
+An autopilot that prepares the monthly package of foreign purchase invoices
+for the accountant: it extracts and validates each invoice, reconciles them
+with card charges, researches suppliers it has never seen, stops at
+exceptions and sends nothing without a person's approval. The spec is
+`docs/spec.md`; items tagged **[proposed]** there are not confirmed yet.
 
 ## What wins (from the brief)
 
