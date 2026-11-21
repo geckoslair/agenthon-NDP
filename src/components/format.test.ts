@@ -9,6 +9,7 @@ import {
   formatMonth,
   invoiceStatus,
   outboxStatus,
+  selfInvoiceStatus,
   supplierStatus,
 } from "./format";
 
@@ -54,5 +55,12 @@ describe("format helpers", () => {
     expect(cleanName("   ")).toBeNull();
     expect(cleanName(undefined)).toBeNull();
     expect(cleanName("x".repeat(81))).toBeNull();
+  });
+
+  it("labels self-invoice statuses", () => {
+    expect(selfInvoiceStatus("needs_input")).toEqual({ label: "Da completare", tone: "warn" });
+    expect(selfInvoiceStatus("submitted").label).toContain("simulata");
+    expect(selfInvoiceStatus("rejected").tone).toBe("bad");
+    expect(selfInvoiceStatus("x").tone).toBe("neutral");
   });
 });

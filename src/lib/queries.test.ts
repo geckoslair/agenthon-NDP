@@ -8,6 +8,9 @@ import {
   getOverview,
   DEFAULT_MONTH,
   listAudit,
+  listSelfInvoices,
+  getSelfInvoice,
+  getComplianceCounts,
   listAutoSend,
   listExceptions,
   listInvoiceExceptions,
@@ -287,5 +290,73 @@ describe("warnings", () => {
       "INSERT INTO audit_log (run_id, actor, step) VALUES (1,'autopilot','warning')",
     ).run();
     expect(getOverview(db).warnings).toEqual(["Avviso senza dettaglio"]);
+  });
+});
+
+describe("self-invoices", () => {
+  function addSelf(invoice: number, status: string, extra = "") {
+    db.prepare(
+      `INSERT INTO self_invoices (run_id, invoice_id, number, taxable_eur, vat_rate, vat_eur, status ${extra ? ", " + extra.split("=")[0] : ""})
+       VALUES (1, ?, ?, 100, 0.22, 22, ? ${extra ? ", " + extra.split("=")[1] : ""})`,
+    ).run(invoice, `AF-${invoice}`, status);
+  }
+
+  it("is empty with no run or no rows", () => {
+    expect(listSelfInvoices(openDb(":memory:"))).toEqual([]);
+    expect(listSelfInvoices(db)).toEqual([]);
+    expect(getComplianceCounts(db)).toEqual({
+      needsInput: 0,
+      drafts: 0,
+      approved: 0,
+      submitted: 0,
+      exported: 0,
+    });
+    expect(getSelfInvoice(db, 1)).toBeNull();
+  });
+
+  it("joins the foreign invoice and computes the total", () => {
+    const inv = addInvoice("a.pdf", "nimbus", "ok");
+    addSelf(inv, "draft");
+    const [row] = listSelfInvoices(db);
+    expect(row).toMatchObject({
+      docType: "TD17",
+      supplierName: "Nimbus",
+      invoiceFile: "a.pdf",
+      originalCurrency: "EUR",
+      originalAmount: 120,
+      taxableEur: 100,
+      totalEur: 122,
+    });
+    expect(getSelfInvoice(db, row.id)?.number).toBe(`AF-${inv}`);
+  });
+
+  it("leaves the total null while the EUR amount is missing", () => {
+    const inv = addInvoice("b.pdf", "orbit", "ok");
+    db.prepare(
+      "INSERT INTO self_invoices (run_id, invoice_id, number, vat_rate, status, needs_input_reason) VALUES (1, ?, 'AF-x', 0.22, 'needs_input', 'Importo in euro mancante')",
+    ).run(inv);
+    const [row] = listSelfInvoices(db);
+    expect(row.totalEur).toBeNull();
+    expect(row.needsInputReason).toBe("Importo in euro mancante");
+  });
+
+  it("counts by status and exported rows for the latest run", () => {
+    const ids = [1, 2, 3, 4, 5].map((i) => addInvoice(`f${i}.pdf`, "nimbus", "ok"));
+    ["needs_input", "draft", "approved", "submitted", "submitted"].forEach((s, i) =>
+      addSelf(ids[i], s),
+    );
+    db.prepare(
+      "UPDATE self_invoices SET accounting_status = 'exported', accounting_ref = 'R1' WHERE invoice_id = ?",
+    ).run(ids[4]);
+    expect(getComplianceCounts(db)).toEqual({
+      needsInput: 1,
+      drafts: 1,
+      approved: 1,
+      submitted: 2,
+      exported: 1,
+    });
+    db.prepare("INSERT INTO runs (month) VALUES ('2026-11')").run();
+    expect(getComplianceCounts(db).drafts).toBe(0);
+    expect(listSelfInvoices(db, 1)).toHaveLength(5);
   });
 });

@@ -7,6 +7,7 @@ const LINKS = [
   { href: "/", label: "Panoramica" },
   { href: "/eccezioni", label: "Eccezioni" },
   { href: "/approvazioni", label: "Approvazioni" },
+  { href: "/adempimenti", label: "Adempimenti" },
   { href: "/fornitori", label: "Fornitori" },
   { href: "/registro", label: "Registro" },
 ];

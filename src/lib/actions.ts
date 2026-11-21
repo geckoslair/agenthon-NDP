@@ -6,6 +6,12 @@ import { cleanName } from "@/components/format";
 import { decideOutgoing, markSent, setAutoSend } from "./audit";
 import { getDb } from "./db";
 import { DEFAULT_MONTH, getLatestRun } from "./queries";
+import {
+  decideSelfInvoice,
+  exportToAccounting,
+  setEuroAmount,
+  submitSelfInvoice,
+} from "./compliance";
 import { resetDemo, resolveException, runMonth } from "./pipeline";
 
 export interface ActionResult {
@@ -146,5 +152,90 @@ export async function setAutoSendAction(
         ? "Invio automatico attivato per questo modello."
         : "Invio automatico disattivato.",
     };
+  });
+}
+
+// --- Adempimenti: simulated self-invoice, SdI submission and accounting export ---
+
+export async function setEuroAmountAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const selfId = id(formData, "id");
+  const raw = text(formData, "amount").replace(",", ".");
+  const amount = Number(raw);
+  const person = cleanName(formData.get("person"));
+  if (!selfId) return { ok: false, message: "Autofattura non valida." };
+  if (!raw || !Number.isFinite(amount) || amount <= 0) {
+    return { ok: false, message: "Scrivi un importo in euro maggiore di zero." };
+  }
+  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
+  return guarded(() =>
+    setEuroAmount(getDb(), selfId, amount, person)
+      ? { ok: true, message: "Importo salvato. La bozza è pronta per la tua revisione." }
+      : { ok: false, message: "L'importo si può indicare solo per le righe che lo aspettano." },
+  );
+}
+
+export async function decideSelfInvoiceAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const selfId = id(formData, "id");
+  const decision = text(formData, "decision");
+  const person = cleanName(formData.get("person"));
+  if (!selfId) return { ok: false, message: "Autofattura non valida." };
+  if (decision !== "approved" && decision !== "rejected") {
+    return { ok: false, message: "Decisione non valida." };
+  }
+  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
+  return guarded(() =>
+    decideSelfInvoice(getDb(), selfId, decision, person)
+      ? {
+          ok: true,
+          message: decision === "approved" ? "Bozza approvata." : "Bozza rifiutata.",
+        }
+      : { ok: false, message: "Si possono decidere solo le bozze." },
+  );
+}
+
+export async function submitSelfInvoiceAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const selfId = id(formData, "id");
+  if (!selfId) return { ok: false, message: "Autofattura non valida." };
+  return guarded(async () => {
+    const r = await submitSelfInvoice(getDb(), selfId);
+    return r.ok
+      ? {
+          ok: true,
+          message: `Trasmissione simulata riuscita. Ricevuta ${r.receipt ?? "—"}. Nessun invio reale.`,
+        }
+      : { ok: false, message: r.error ?? "Trasmissione simulata non riuscita." };
+  });
+}
+
+export async function exportAccountingAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const person = cleanName(formData.get("person"));
+  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
+  return guarded(async () => {
+    const db = getDb();
+    const run = getLatestRun(db);
+    if (!run) return { ok: false, message: "Non c'è ancora un giro." };
+    const r = await exportToAccounting(db, run.id, person);
+    return r.ok
+      ? {
+          ok: true,
+          message: `Esportate ${r.exported} registrazioni (simulato). Nessun gestionale reale è stato contattato.`,
+        }
+      : { ok: false, message: r.error ?? "Esportazione simulata non riuscita." };
   });
 }

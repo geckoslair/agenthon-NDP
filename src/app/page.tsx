@@ -12,7 +12,7 @@ import { StateTag } from "@/components/state-tag";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { resetDemoAction, runMonthAction } from "@/lib/actions";
 import { getDb } from "@/lib/db";
-import { getOverview, listInvoices } from "@/lib/queries";
+import { getComplianceCounts, getOverview, listInvoices } from "@/lib/queries";
 import { VoiceBrief } from "@/components/voice-brief";
 import Link from "next/link";
 
@@ -38,6 +38,7 @@ export default function Home() {
   const invoices = o.run ? listInvoices(db, o.run.id) : [];
   const counts = new Map(o.channels.map((c) => [c.channel, c.count]));
   const extra = o.channels.filter((c) => !CHANNELS.includes(c.channel));
+  const c = getComplianceCounts(db);
   const pkg = o.package ? outboxStatus(o.package.status) : null;
 
   return (
@@ -121,6 +122,27 @@ export default function Home() {
                 {o.pendingApprovals > 0 && (
                   <span className="text-ink-2">({o.pendingApprovals} in attesa)</span>
                 )}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <p className="eyebrow">Adempimenti (simulati)</p>
+              <CardTitle>Autofatture</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              <ul className="flex flex-wrap gap-x-5 gap-y-1">
+                <li>{c.needsInput} da completare</li>
+                <li>{c.drafts} bozze</li>
+                <li>{c.approved} approvate</li>
+                <li>{c.submitted} trasmesse</li>
+                <li>{c.exported} esportate</li>
+              </ul>
+              <p>
+                <Link href="/adempimenti" className="font-semibold underline">
+                  Vai agli adempimenti →
+                </Link>
               </p>
             </CardContent>
           </Card>

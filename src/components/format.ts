@@ -204,3 +204,20 @@ export function cleanName(value: unknown): string | null {
   const t = value.trim().replace(/\s+/g, " ");
   return t.length > 0 && t.length <= 80 ? t : null;
 }
+
+export function selfInvoiceStatus(status: string): { label: string; tone: Tone } {
+  switch (status) {
+    case "needs_input":
+      return { label: "Da completare", tone: "warn" };
+    case "draft":
+      return { label: "Bozza da approvare", tone: "warn" };
+    case "approved":
+      return { label: "Approvata, non trasmessa", tone: "ok" };
+    case "submitted":
+      return { label: "Trasmessa (simulata)", tone: "ok" };
+    case "rejected":
+      return { label: "Rifiutata", tone: "bad" };
+    default:
+      return { label: status, tone: "neutral" };
+  }
+}

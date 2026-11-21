@@ -510,3 +510,141 @@ export function listInvoices(db: Db, runId: number): InvoiceListRow[] {
     channel: r.source ?? r.invoice_source,
   }));
 }
+
+export interface SelfInvoiceRow {
+  id: number;
+  runId: number;
+  invoiceId: number;
+  docType: string;
+  number: string;
+  taxableEur: number | null;
+  vatRate: number;
+  vatEur: number | null;
+  /** taxable + VAT, null while the EUR amount is missing. */
+  totalEur: number | null;
+  xmlPath: string | null;
+  status: "needs_input" | "draft" | "approved" | "submitted" | "rejected";
+  needsInputReason: string | null;
+  approvedBy: string | null;
+  approvedAt: string | null;
+  submittedAt: string | null;
+  sdiReceipt: string | null;
+  accountingStatus: "pending" | "exported";
+  accountingRef: string | null;
+  exportedBy: string | null;
+  exportedAt: string | null;
+  /** The foreign invoice it was generated from. */
+  invoiceFile: string;
+  supplierName: string | null;
+  invoiceNumber: string | null;
+  invoiceDate: string | null;
+  originalAmount: number | null;
+  originalCurrency: string | null;
+}
+
+interface SelfInvoiceDbRow {
+  id: number;
+  run_id: number;
+  invoice_id: number;
+  doc_type: string;
+  number: string;
+  taxable_eur: number | null;
+  vat_rate: number;
+  vat_eur: number | null;
+  xml_path: string | null;
+  status: SelfInvoiceRow["status"];
+  needs_input_reason: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  submitted_at: string | null;
+  sdi_receipt: string | null;
+  accounting_status: SelfInvoiceRow["accountingStatus"];
+  accounting_ref: string | null;
+  exported_by: string | null;
+  exported_at: string | null;
+  file_name: string;
+  supplier_name: string | null;
+  extracted: string;
+}
+
+function toSelfInvoice(r: SelfInvoiceDbRow): SelfInvoiceRow {
+  let ex: Partial<ExtractedInvoice> = {};
+  try {
+    ex = JSON.parse(r.extracted) as Partial<ExtractedInvoice>;
+  } catch {
+    ex = {};
+  }
+  return {
+    id: r.id,
+    runId: r.run_id,
+    invoiceId: r.invoice_id,
+    docType: r.doc_type,
+    number: r.number,
+    taxableEur: r.taxable_eur,
+    vatRate: r.vat_rate,
+    vatEur: r.vat_eur,
+    totalEur:
+      r.taxable_eur === null ? null : Math.round((r.taxable_eur + (r.vat_eur ?? 0)) * 100) / 100,
+    xmlPath: r.xml_path,
+    status: r.status,
+    needsInputReason: r.needs_input_reason,
+    approvedBy: r.approved_by,
+    approvedAt: r.approved_at,
+    submittedAt: r.submitted_at,
+    sdiReceipt: r.sdi_receipt,
+    accountingStatus: r.accounting_status,
+    accountingRef: r.accounting_ref,
+    exportedBy: r.exported_by,
+    exportedAt: r.exported_at,
+    invoiceFile: r.file_name,
+    supplierName: r.supplier_name ?? ex.supplierName?.value ?? null,
+    invoiceNumber: ex.invoiceNumber?.value ?? null,
+    invoiceDate: ex.invoiceDate?.value ?? null,
+    originalAmount: ex.totalAmount?.value ?? null,
+    originalCurrency: ex.currency?.value ?? null,
+  };
+}
+
+const SELF_INVOICE_SELECT = `
+  SELECT si.*, i.file_name, i.extracted, s.name AS supplier_name
+  FROM self_invoices si
+  JOIN invoices i ON i.id = si.invoice_id
+  LEFT JOIN suppliers s ON s.id = i.supplier_id`;
+
+/** Self-invoices of the latest run (or of the given run), by id. */
+export function listSelfInvoices(db: Db, runId?: number): SelfInvoiceRow[] {
+  const run = runId ?? getLatestRun(db)?.id;
+  if (run === undefined) return [];
+  return (
+    db
+      .prepare(`${SELF_INVOICE_SELECT} WHERE si.run_id = ? ORDER BY si.id`)
+      .all(run) as SelfInvoiceDbRow[]
+  ).map(toSelfInvoice);
+}
+
+export function getSelfInvoice(db: Db, id: number): SelfInvoiceRow | null {
+  const r = db.prepare(`${SELF_INVOICE_SELECT} WHERE si.id = ?`).get(id) as
+    SelfInvoiceDbRow | undefined;
+  return r ? toSelfInvoice(r) : null;
+}
+
+export interface ComplianceCounts {
+  needsInput: number;
+  drafts: number;
+  approved: number;
+  submitted: number;
+  exported: number;
+}
+
+/** Counts for the overview tile, for the latest run. */
+export function getComplianceCounts(db: Db): ComplianceCounts {
+  const rows = listSelfInvoices(db);
+  const n = (s: SelfInvoiceRow["status"]) => rows.filter((r) => r.status === s).length;
+  return {
+    needsInput: n("needs_input"),
+    drafts: n("draft"),
+    approved: n("approved"),
+    submitted: n("submitted"),
+    exported: rows.filter((r) => r.accountingStatus === "exported").length,
+  };
+}
