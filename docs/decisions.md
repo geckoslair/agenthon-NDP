@@ -40,6 +40,27 @@ it is not decided; ask the humans.
   person's approval. This reverses the earlier "not today" for the
   self-invoice XML and SdI.
 
+## Decided (21 November 2026, 15:45 to 16:20), after the team reviewed the UI
+
+- **Wording:** the monthly run is called "chiusura" in the interface.
+- **Overview:** a dashboard of counts; no per-channel breakdown; the next
+  closure is shown as "prevista" because no scheduler exists.
+- **Invoice page:** values only, with a link to the original PDF. Quotes
+  stay as evidence on exceptions.
+- **Package:** blocked while a request to a supplier is unanswered; a person
+  can send it anyway, and that is logged.
+- **Destination:** the accountant by email, or a direct ERP integration
+  (simulated), chosen by a person.
+- **Unreadable fields:** a person types the missing values; they are
+  validated, saved with their own provenance ("manual", who, when, no
+  quote), the rules run again, and the exception closes only if the problem
+  is really solved.
+- **Signed-in user:** there is no login. The team chose a made-up demo user
+  set on the server; the header says "accesso simulato".
+- **Voice:** reduced to one button on the overview.
+- **Not done:** a recorded video of the browser collection; a second month
+  of demo data.
+
 ## Open
 
 - Where ElevenLabs fits in the product.

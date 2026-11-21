@@ -35,8 +35,10 @@ the project is described in [`docs/domain.md`](docs/domain.md).
    mailbox, the supplier's billing API, and browser automation of the
    supplier's dashboard as a fallback.
 2. **Extract** from each PDF: supplier, country, tax id, number, date,
-   amount, currency, addressee, VAT. Every value keeps the verbatim quote
-   and the page it was read from.
+   amount, currency, addressee, VAT. Every value read from the document keeps the
+   verbatim quote and the page. A value a person types in to complete an
+   unreadable field is marked "entered by hand", with who and when, and
+   carries no quote.
 3. **Match** the supplier against the registry. A supplier never seen
    before is researched on its public billing page; each fact is kept with
    its source and quote. A fact without a source stays "unknown": it is never
