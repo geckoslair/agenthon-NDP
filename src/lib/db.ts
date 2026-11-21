@@ -131,6 +131,30 @@ CREATE TABLE IF NOT EXISTS self_invoices (
   UNIQUE (run_id, invoice_id)
 );
 
+-- A correction requested from a supplier for an invoice that cannot be accepted as is
+-- (foreign VAT charged, addressed to a person). The original invoice and its PDF are kept.
+CREATE TABLE IF NOT EXISTS corrections (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  run_id INTEGER NOT NULL REFERENCES runs(id),
+  invoice_id INTEGER NOT NULL REFERENCES invoices(id),
+  exception_id INTEGER NOT NULL REFERENCES exceptions(id),
+  -- The supplier email asking for the correction (outbox row), when one was queued.
+  outbox_id INTEGER REFERENCES outbox(id),
+  status TEXT NOT NULL DEFAULT 'requested'
+    CHECK (status IN ('requested','document_received','validated','failed')),
+  requested_by TEXT NOT NULL,
+  requested_at TEXT NOT NULL DEFAULT (datetime('now')),
+  -- The corrected document, once a person attaches it.
+  corrected_file TEXT,
+  corrected_path TEXT,
+  -- JSON of ExtractedInvoice read from the corrected document; NULL when not extracted.
+  corrected_extracted TEXT,
+  attached_by TEXT,
+  attached_at TEXT,
+  -- Why the corrected document did not resolve the exception, when it did not.
+  failure_reason TEXT
+);
+
 -- Small key/value store for choices a person makes (e.g. delivery_mode).
 CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,
