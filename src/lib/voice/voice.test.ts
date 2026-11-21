@@ -52,10 +52,10 @@ describe("buildBrief", () => {
     expect(text).toContain("Giro di ottobre 2026.");
     expect(text).toContain("Hai 3 fatture raccolte: 2 da email, 1 dalle API dei fornitori.");
     expect(text).toContain("2 sono pronte.");
-    expect(text).toContain("Hai 2 eccezioni aperte.");
+    expect(text).toContain("Hai 1 eccezione aperta.");
     expect(text).toContain("Orbit Analytics: è stata addebitata l'IVA estera.");
-    expect(text).toContain("C'è un addebito sulla carta senza fattura.");
-    expect(text).toContain("1 fattura attesa non è arrivata.");
+    expect(text).not.toContain("carta senza fattura");
+    expect(text).not.toContain("attesa non è arrivata");
     expect(text).toContain("1 invio aspetta la tua approvazione.");
     expect(text).toContain("Niente parte senza il tuo sì.");
   });
@@ -125,8 +125,8 @@ describe("buildShortBrief", () => {
     ).run();
     const text = buildShortBrief(db);
     expect(text).toBe(
-      "Hai raccolto 4 fatture: una pronta, 3 bloccate, una mancante. " +
-        "6 eccezioni aperte: 2 con IVA estera addebitata, una fattura mancante, una doppia e altri 2. " +
+      "Hai raccolto 4 fatture: una pronta, 3 bloccate. " +
+        "5 eccezioni aperte: 2 con IVA estera addebitata, una doppia, un fornitore sconosciuto e un altro caso. " +
         "1 invio aspetta la tua approvazione.",
     );
     expect(words(text)).toBeLessThanOrEqual(45);
@@ -149,7 +149,7 @@ describe("buildShortBrief", () => {
       addException(code, "orbit");
     const text = buildShortBrief(db);
     expect(text).toContain(
-      "9 eccezioni aperte: una fattura mancante, una con IVA estera addebitata, una doppia e altri 6.",
+      "8 eccezioni aperte: una con IVA estera addebitata, una doppia, un fornitore sconosciuto e altri 5.",
     );
     expect(words(text)).toBeLessThanOrEqual(50);
   });
@@ -158,7 +158,7 @@ describe("buildShortBrief", () => {
     seedRun();
     addInvoice("a.pdf", "nimbus", "email", "ok");
     expect(buildShortBrief(db)).toBe(
-      "Hai raccolto 1 fattura: una pronta, nessuna bloccata, nessuna mancante. " +
+      "Hai raccolto 1 fattura: una pronta, nessuna bloccata. " +
         "Nessuna eccezione aperta. Nessun invio in attesa di approvazione.",
     );
   });

@@ -142,7 +142,6 @@ export default async function Home({
       <section aria-label="Riepilogo" className="flex flex-wrap gap-5">
         <Tile label="Fatture pronte" value={o.ready} hint="controllate" />
         <Tile label="Bloccate" value={o.blocked} hint="aspettano te" href="/eccezioni" />
-        <Tile label="Mancanti" value={o.missing} hint="attese, non arrivate" href="/eccezioni" />
         <Tile
           label="Autofatture da approvare"
           value={c.drafts}

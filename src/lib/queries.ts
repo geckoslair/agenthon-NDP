@@ -3,6 +3,13 @@
 import type { Db } from "./db";
 import type { ExtractedInvoice } from "./types";
 
+/**
+ * Exception codes the pipeline no longer creates. Old rows stay in the database for history but
+ * are ignored by every list and counter. Same value as RETIRED_EXCEPTION_CODES in the pipeline.
+ */
+const RETIRED_CODES = ["MISSING_EXPECTED_INVOICE"] as const;
+const NOT_RETIRED = `e.code NOT IN (${RETIRED_CODES.map((c) => `'${c}'`).join(",")})`;
+
 /** Demo month, used until a run exists. */
 export const DEFAULT_MONTH = process.env.PROBATA_MONTH ?? "2026-10";
 
@@ -54,8 +61,6 @@ export interface Overview {
   collected: number;
   ready: number;
   blocked: number;
-  /** Open exceptions of kind "missing expected invoice". */
-  missing: number;
   openExceptions: number;
   pendingApprovals: number;
   package: { id: number; status: string; sentAt: string | null } | null;
@@ -90,7 +95,6 @@ export function getOverview(db: Db, month?: string | null): Overview {
       collected: 0,
       ready: 0,
       blocked: 0,
-      missing: 0,
       openExceptions: 0,
       pendingApprovals: 0,
       package: null,
@@ -116,7 +120,9 @@ export function getOverview(db: Db, month?: string | null): Overview {
     }
   ).n;
   const open = db
-    .prepare("SELECT code FROM exceptions WHERE run_id = ? AND status = 'open'")
+    .prepare(
+      `SELECT code FROM exceptions e WHERE run_id = ? AND status = 'open' AND ${NOT_RETIRED}`,
+    )
     .all(run.id) as { code: string }[];
   const pkg = db
     .prepare(
@@ -134,7 +140,6 @@ export function getOverview(db: Db, month?: string | null): Overview {
     collected,
     ready: byStatus("ok"),
     blocked: byStatus("exception"),
-    missing: open.filter((e) => e.code === "MISSING_EXPECTED_INVOICE").length,
     openExceptions: open.length,
     pendingApprovals: pending,
     package: pkg ? { id: pkg.id, status: pkg.status, sentAt: pkg.sent_at } : null,
@@ -210,7 +215,7 @@ export function listExceptions(db: Db, status: "open" | "resolved"): ExceptionRo
   const order = status === "open" ? "e.id ASC" : "e.resolved_at DESC, e.id DESC";
   return (
     db
-      .prepare(`${EXCEPTION_SELECT} WHERE e.status = ? ORDER BY ${order}`)
+      .prepare(`${EXCEPTION_SELECT} WHERE e.status = ? AND ${NOT_RETIRED} ORDER BY ${order}`)
       .all(status) as ExceptionDbRow[]
   ).map(toException);
 }
@@ -218,7 +223,7 @@ export function listExceptions(db: Db, status: "open" | "resolved"): ExceptionRo
 export function listInvoiceExceptions(db: Db, invoiceId: number): ExceptionRow[] {
   return (
     db
-      .prepare(`${EXCEPTION_SELECT} WHERE e.invoice_id = ? ORDER BY e.id`)
+      .prepare(`${EXCEPTION_SELECT} WHERE e.invoice_id = ? AND ${NOT_RETIRED} ORDER BY e.id`)
       .all(invoiceId) as ExceptionDbRow[]
   ).map(toException);
 }

@@ -73,7 +73,7 @@ describe("getOverview", () => {
     expect(o.package).toBeNull();
   });
 
-  it("counts invoices by channel, status and missing exceptions", () => {
+  it("counts invoices by channel and status, ignoring retired exceptions", () => {
     const a = addInvoice("a.pdf", "nimbus", "ok");
     addInvoice("b.pdf", "orbit", "exception");
     addInvoice("c.pdf", null, "ok");
@@ -97,8 +97,8 @@ describe("getOverview", () => {
     expect(o.collected).toBe(3);
     expect(o.ready).toBe(2);
     expect(o.blocked).toBe(1);
-    expect(o.missing).toBe(1);
-    expect(o.openExceptions).toBe(2);
+    // MISSING_EXPECTED_INVOICE is retired: old rows are ignored by every counter.
+    expect(o.openExceptions).toBe(1);
     expect(o.pendingApprovals).toBe(1);
     expect(o.package?.status).toBe("pending");
     expect(Object.fromEntries(o.channels.map((c) => [c.channel, c.count]))).toEqual({
@@ -442,5 +442,28 @@ describe("getOutbox", () => {
     });
     expect(getOutbox(db, id)).toMatchObject({ kind: "package", status: "pending" });
     expect(getOutbox(db, 999)).toBeNull();
+  });
+});
+
+describe("retired exception code", () => {
+  it("is hidden from every list and counter but stays in the database", () => {
+    const inv = addInvoice("r.pdf", "nimbus", "exception");
+    db.prepare(
+      "INSERT INTO exceptions (run_id, invoice_id, code, message) VALUES (1, ?, 'MISSING_EXPECTED_INVOICE', 'old')",
+    ).run(inv);
+    db.prepare(
+      "INSERT INTO exceptions (run_id, invoice_id, code, message, status, resolved_at) VALUES (1, ?, 'MISSING_EXPECTED_INVOICE', 'old2', 'resolved', '2026-11-21 10:00:00')",
+    ).run(inv);
+    db.prepare(
+      "INSERT INTO exceptions (run_id, invoice_id, code, message) VALUES (1, ?, 'DUPLICATE', 'dup')",
+    ).run(inv);
+    expect(listExceptions(db, "open").map((e) => e.code)).toEqual(["DUPLICATE"]);
+    expect(listExceptions(db, "resolved")).toEqual([]);
+    expect(listInvoiceExceptions(db, inv).map((e) => e.code)).toEqual(["DUPLICATE"]);
+    expect(getOverview(db).openExceptions).toBe(1);
+    const stored = db
+      .prepare("SELECT COUNT(*) AS n FROM exceptions WHERE code = 'MISSING_EXPECTED_INVOICE'")
+      .get() as { n: number };
+    expect(stored.n).toBe(2);
   });
 });

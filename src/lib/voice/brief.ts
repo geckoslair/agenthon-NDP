@@ -33,7 +33,6 @@ const CHANNEL_PHRASE: Record<string, string> = {
 
 /** What is wrong, as a short clause. Unknown codes are read as the code itself. */
 const WRONG: Record<string, string> = {
-  MISSING_EXPECTED_INVOICE: "manca una fattura attesa",
   ADDRESSED_TO_PERSON: "la fattura non è intestata alla società",
   FOREIGN_VAT_CHARGED: "è stata addebitata l'IVA estera",
   WRONG_MONTH: "la data non è nel mese del giro",
@@ -51,8 +50,6 @@ function plural(n: number, one: string, many: string): string {
 function exceptionSentence(supplierName: string | null, code: string): string {
   const wrong = WRONG[code] ?? `codice ${code}`;
   if (supplierName) return `${supplierName}: ${wrong}.`;
-  // A card charge with no invoice has no supplier attached.
-  if (code === "MISSING_EXPECTED_INVOICE") return "C'è un addebito sulla carta senza fattura.";
   return `Fornitore sconosciuto: ${wrong}.`;
 }
 
@@ -89,12 +86,6 @@ export function buildBrief(db: Db): string {
     for (const e of open) parts.push(exceptionSentence(e.supplierName, e.code));
   }
 
-  if (o.missing > 0) {
-    parts.push(
-      `${o.missing} ${plural(o.missing, "fattura attesa non è arrivata", "fatture attese non sono arrivate")}.`,
-    );
-  }
-
   if (o.package?.status === "sent" && o.pendingApprovals === 0) {
     parts.push("Il pacchetto è stato inviato.");
   } else if (o.pendingApprovals > 0) {
@@ -113,7 +104,6 @@ export function buildBrief(db: Db): string {
 
 /** Exception kinds in the order they are named when counts tie: (singular, plural). */
 const GROUPS: [string, string, string][] = [
-  ["MISSING_EXPECTED_INVOICE", "una fattura mancante", "fatture mancanti"],
   ["FOREIGN_VAT_CHARGED", "una con IVA estera addebitata", "con IVA estera addebitata"],
   ["DUPLICATE", "una doppia", "doppie"],
   ["SUPPLIER_FACTS_UNKNOWN", "un fornitore sconosciuto", "fornitori sconosciuti"],
@@ -147,8 +137,7 @@ export function buildShortBrief(db: Db): string {
       ? "Non ho raccolto nessuna fattura."
       : `Hai raccolto ${o.collected} ${plural(o.collected, "fattura", "fatture")}: ` +
         `${o.ready === 0 ? "nessuna pronta" : countPhrase(o.ready, "una pronta", "pronte")}, ` +
-        `${o.blocked === 0 ? "nessuna bloccata" : countPhrase(o.blocked, "una bloccata", "bloccate")}, ` +
-        `${o.missing === 0 ? "nessuna mancante" : countPhrase(o.missing, "una mancante", "mancanti")}.`;
+        `${o.blocked === 0 ? "nessuna bloccata" : countPhrase(o.blocked, "una bloccata", "bloccate")}.`;
 
   const open = listExceptions(db, "open").filter((e) => e.runId === run.id);
   let exceptions: string;
