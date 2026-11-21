@@ -397,6 +397,10 @@ export interface SupplierRow {
   facts: SupplierFact[];
 }
 
+export function getSupplier(db: Db, id: string): SupplierRow | null {
+  return listSuppliers(db).find((s) => s.id === id) ?? null;
+}
+
 export function listSuppliers(db: Db): SupplierRow[] {
   const suppliers = db.prepare("SELECT * FROM suppliers ORDER BY name COLLATE NOCASE").all() as {
     id: string;
@@ -483,14 +487,20 @@ export interface InvoiceListRow {
   status: string;
   supplierName: string | null;
   channel: string | null;
+  /** Document number, date and amount as read from the invoice (null when not read). */
+  documentNumber: string | null;
+  date: string | null;
+  amount: number | null;
+  currency: string | null;
 }
 
-/** Invoices of a run, for the overview. */
+/** Invoices of a run, for the overview table. */
 export function listInvoices(db: Db, runId: number): InvoiceListRow[] {
   return (
     db
       .prepare(
-        `SELECT i.id, i.file_name, i.status, s.name AS supplier_name, s.invoice_source, i.source
+        `SELECT i.id, i.file_name, i.status, i.extracted, s.name AS supplier_name,
+                s.invoice_source, i.source
          FROM invoices i LEFT JOIN suppliers s ON s.id = i.supplier_id
          WHERE i.run_id = ? ORDER BY i.id`,
       )
@@ -498,17 +508,30 @@ export function listInvoices(db: Db, runId: number): InvoiceListRow[] {
       id: number;
       file_name: string;
       status: string;
+      extracted: string;
       supplier_name: string | null;
       invoice_source: string | null;
       source: string | null;
     }[]
-  ).map((r) => ({
-    id: r.id,
-    fileName: r.file_name,
-    status: r.status,
-    supplierName: r.supplier_name,
-    channel: r.source ?? r.invoice_source,
-  }));
+  ).map((r) => {
+    let ex: Partial<ExtractedInvoice> = {};
+    try {
+      ex = JSON.parse(r.extracted) as Partial<ExtractedInvoice>;
+    } catch {
+      ex = {};
+    }
+    return {
+      id: r.id,
+      fileName: r.file_name,
+      status: r.status,
+      supplierName: r.supplier_name ?? ex.supplierName?.value ?? null,
+      channel: r.source ?? r.invoice_source,
+      documentNumber: ex.invoiceNumber?.value ?? null,
+      date: ex.invoiceDate?.value ?? null,
+      amount: ex.totalAmount?.value ?? null,
+      currency: ex.currency?.value ?? null,
+    };
+  });
 }
 
 export interface SelfInvoiceRow {

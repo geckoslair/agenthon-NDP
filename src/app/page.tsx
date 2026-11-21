@@ -1,15 +1,20 @@
 import { ActionForm, SubmitButton } from "@/components/action-form";
 import {
-  channelLabel,
-  formatDateTime,
+  formatAmount,
   formatMonth,
   invoiceStatus,
   outboxStatus,
   runStatus,
 } from "@/components/format";
-import { PageHeader } from "@/components/page-header";
 import { StateTag } from "@/components/state-tag";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { resetDemoAction, runMonthAction } from "@/lib/actions";
 import { getDb } from "@/lib/db";
 import { getComplianceCounts, getOverview, listInvoices } from "@/lib/queries";
@@ -18,17 +23,35 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-const CHANNELS = ["email", "billing_api", "browser"];
-
-function Row({ label, hint, value }: { label: string; hint?: string; value: number }) {
-  return (
-    <li className="flex items-baseline justify-between gap-4 rounded-[12px] bg-background px-4 py-3">
-      <span>
-        <span className="font-semibold">{label}</span>
-        {hint && <span className="ml-2 text-ink-2">{hint}</span>}
-      </span>
-      <span className="font-serif text-2xl">{value}</span>
-    </li>
+function Tile({
+  label,
+  value,
+  hint,
+  href,
+  children,
+}: {
+  label: string;
+  value?: number;
+  hint?: string;
+  href?: string;
+  children?: React.ReactNode;
+}) {
+  const inner = (
+    <>
+      <span className="eyebrow">{label}</span>
+      {value !== undefined && <span className="font-serif text-4xl leading-none">{value}</span>}
+      {children}
+      {hint && <span className="text-sm text-ink-2">{hint}</span>}
+    </>
+  );
+  const cls =
+    "flex min-h-28 flex-col justify-between gap-2 rounded-[14px] border border-line bg-card p-4";
+  return href ? (
+    <Link href={href} className={`${cls} hover:border-foreground hover:text-foreground`}>
+      {inner}
+    </Link>
+  ) : (
+    <div className={cls}>{inner}</div>
   );
 }
 
@@ -36,18 +59,36 @@ export default function Home() {
   const db = getDb();
   const o = getOverview(db);
   const invoices = o.run ? listInvoices(db, o.run.id) : [];
-  const counts = new Map(o.channels.map((c) => [c.channel, c.count]));
-  const extra = o.channels.filter((c) => !CHANNELS.includes(c.channel));
   const c = getComplianceCounts(db);
   const pkg = o.package ? outboxStatus(o.package.status) : null;
 
   return (
     <>
-      <PageHeader
-        eyebrow={formatMonth(o.month)}
-        title="Il giro del mese"
-        lead="Probata raccoglie le fatture estere, controlla ogni dato e si ferma a ogni dubbio. Non invia nulla senza la tua approvazione."
-      />
+      <div className="mb-8 flex flex-wrap items-start justify-between gap-x-8 gap-y-5">
+        <div className="max-w-[60ch]">
+          <p className="eyebrow mb-2">{formatMonth(o.month)}</p>
+          <h1>Il giro del mese</h1>
+          <p className="mt-2 text-ink-2">
+            Probata controlla ogni dato e si ferma a ogni dubbio. Non invia nulla senza la tua
+            approvazione.
+          </p>
+          {o.run && (
+            <p className="mt-3">
+              <StateTag {...runStatus(o.run.status)} />
+            </p>
+          )}
+        </div>
+        <div className="flex flex-col gap-3">
+          <ActionForm action={runMonthAction}>
+            <SubmitButton pendingLabel="Giro in corso…">Avvia il giro del mese</SubmitButton>
+          </ActionForm>
+          <ActionForm action={resetDemoAction}>
+            <SubmitButton variant="outline" pendingLabel="Ripristino…">
+              Ripristina demo
+            </SubmitButton>
+          </ActionForm>
+        </div>
+      </div>
 
       {o.warnings.length > 0 && (
         <section aria-labelledby="warn" className="mb-8 rounded-[14px] border border-warn p-5">
@@ -63,137 +104,72 @@ export default function Home() {
         </section>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[3fr_2fr]">
-        <Card>
-          <CardHeader>
-            <p className="eyebrow">Fatture raccolte</p>
-            <CardTitle>
-              {o.run ? `${o.collected} fatture nel giro` : "Nessun giro ancora"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-5">
-            {!o.run && (
-              <p className="text-ink-2">
-                Avvia il giro del mese per raccogliere le fatture da email, API e browser.
-              </p>
-            )}
-            <ul className="flex flex-col gap-2">
-              {CHANNELS.map((c) => (
-                <Row key={c} label={channelLabel(c)} value={counts.get(c) ?? 0} />
-              ))}
-              {extra.map((c) => (
-                <Row key={c.channel} label={channelLabel(c.channel)} value={c.count} />
-              ))}
-            </ul>
-            <p className="eyebrow">Esito</p>
-            <ul className="flex flex-col gap-2">
-              <Row label="Pronte" hint="controllate, nessun dubbio" value={o.ready} />
-              <Row label="Bloccate" hint="aspettano una tua decisione" value={o.blocked} />
-              <Row label="Mancanti" hint="attese ma non arrivate" value={o.missing} />
-            </ul>
-            <div className="flex flex-wrap gap-2">
-              {o.run && <StateTag {...runStatus(o.run.status)} />}
-              {o.openExceptions > 0 && (
-                <StateTag label={`${o.openExceptions} eccezioni aperte`} tone="bad" />
-              )}
-            </div>
-          </CardContent>
-        </Card>
+      <section aria-label="Riepilogo" className="grid grid-cols-2 gap-5 lg:grid-cols-5">
+        <Tile label="Fatture pronte" value={o.ready} hint="controllate" />
+        <Tile label="Bloccate" value={o.blocked} hint="aspettano te" href="/eccezioni" />
+        <Tile label="Mancanti" value={o.missing} hint="attese, non arrivate" href="/eccezioni" />
+        <Tile
+          label="Autofatture da approvare"
+          value={c.drafts}
+          hint={c.needsInput > 0 ? `${c.needsInput} da completare (simulate)` : "simulate"}
+          href="/adempimenti"
+        />
+        <Tile label="Pacchetto" href="/approvazioni">
+          <StateTag
+            label={pkg ? pkg.label : o.run ? "Non ancora pronto" : "Non creato"}
+            tone={pkg ? pkg.tone : "neutral"}
+          />
+        </Tile>
+      </section>
 
-        <div className="flex flex-col gap-5">
-          <Card className="border-foreground shadow-[var(--shadow)]">
-            <CardHeader>
-              <p className="eyebrow">Pacchetto per il commercialista</p>
-              <CardTitle>
-                {pkg ? pkg.label : o.run ? "Non ancora pronto" : "Non ancora creato"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3">
-              {pkg && <StateTag {...pkg} />}
-              <p className="text-ink-2">
-                {o.package?.sentAt
-                  ? `Inviato il ${formatDateTime(o.package.sentAt)} (invio simulato).`
-                  : "Il pacchetto non parte mai da solo: serve la tua approvazione."}
-              </p>
-              <p>
-                <Link href="/approvazioni" className="font-semibold underline">
-                  Vai alle approvazioni →
-                </Link>{" "}
-                {o.pendingApprovals > 0 && (
-                  <span className="text-ink-2">({o.pendingApprovals} in attesa)</span>
-                )}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <p className="eyebrow">Adempimenti (simulati)</p>
-              <CardTitle>Autofatture</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-3">
-              <ul className="flex flex-wrap gap-x-5 gap-y-1">
-                <li>{c.needsInput} da completare</li>
-                <li>{c.drafts} bozze</li>
-                <li>{c.approved} approvate</li>
-                <li>{c.submitted} trasmesse</li>
-                <li>{c.exported} esportate</li>
-              </ul>
-              <p>
-                <Link href="/adempimenti" className="font-semibold underline">
-                  Vai agli adempimenti →
-                </Link>
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="flex flex-col gap-4">
-              <ActionForm action={runMonthAction}>
-                <SubmitButton pendingLabel="Giro in corso…">Avvia il giro del mese</SubmitButton>
-              </ActionForm>
-              <ActionForm action={resetDemoAction}>
-                <SubmitButton variant="outline" pendingLabel="Ripristino…">
-                  Ripristina demo
-                </SubmitButton>
-              </ActionForm>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="lg:col-span-2">
-          <VoiceBrief />
-        </div>
+      <div className="mt-10">
+        <VoiceBrief />
       </div>
 
-      {invoices.length > 0 && (
-        <section className="mt-16 border-t border-line pt-10" aria-labelledby="inv">
-          <p className="eyebrow mb-3">Fatture del giro</p>
-          <h2 id="inv" className="mb-6">
-            Una per una
-          </h2>
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {invoices.map((i) => {
-              const s = invoiceStatus(i.status);
-              return (
-                <li
-                  key={i.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-[14px] border border-line px-4 py-3"
-                >
-                  <span>
-                    <Link href={`/fatture/${i.id}`} className="font-semibold underline">
+      <section className="mt-16 border-t border-line pt-10" aria-labelledby="inv">
+        <p className="eyebrow mb-3">Fatture del giro</p>
+        <h2 id="inv" className="mb-6">
+          Una per una
+        </h2>
+        {invoices.length === 0 ? (
+          <p className="text-ink-2">Nessuna fattura ancora. Avvia il giro del mese.</p>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Fornitore</TableHead>
+                <TableHead>Documento</TableHead>
+                <TableHead>Data</TableHead>
+                <TableHead className="text-right">Importo</TableHead>
+                <TableHead>Stato</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {invoices.map((i) => (
+                <TableRow key={i.id}>
+                  <TableCell className="font-semibold">
+                    <Link href={`/fatture/${i.id}`} className="underline">
                       {i.supplierName ?? "Fornitore sconosciuto"}
                     </Link>
-                    <span className="block text-sm text-ink-2">
-                      {i.fileName} · {channelLabel(i.channel)}
-                    </span>
-                  </span>
-                  <StateTag {...s} />
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/fatture/${i.id}`} className="hover:underline">
+                      {i.documentNumber ?? i.fileName}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">{i.date ?? "non trovata"}</TableCell>
+                  <TableCell className="text-right whitespace-nowrap">
+                    {formatAmount(i.amount, i.currency)}
+                  </TableCell>
+                  <TableCell>
+                    <StateTag {...invoiceStatus(i.status)} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </section>
     </>
   );
 }

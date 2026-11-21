@@ -8,6 +8,7 @@ import {
   getOverview,
   DEFAULT_MONTH,
   listAudit,
+  getSupplier,
   listSelfInvoices,
   getSelfInvoice,
   getComplianceCounts,
@@ -163,7 +164,17 @@ describe("getInvoice", () => {
   it("lists the invoices of a run", () => {
     addInvoice("a.pdf", "nimbus", "ok");
     expect(listInvoices(db, 1)).toEqual([
-      { id: 1, fileName: "a.pdf", status: "ok", supplierName: "Nimbus", channel: "email" },
+      {
+        id: 1,
+        fileName: "a.pdf",
+        status: "ok",
+        supplierName: "Nimbus",
+        channel: "email",
+        documentNumber: null,
+        date: null,
+        amount: 120,
+        currency: "EUR",
+      },
     ]);
     expect(listInvoices(db, 2)).toEqual([]);
   });
@@ -358,5 +369,37 @@ describe("self-invoices", () => {
     db.prepare("INSERT INTO runs (month) VALUES ('2026-11')").run();
     expect(getComplianceCounts(db).drafts).toBe(0);
     expect(listSelfInvoices(db, 1)).toHaveLength(5);
+  });
+});
+
+describe("invoice table rows and supplier detail", () => {
+  it("reads number, date, amount and currency, and survives broken JSON", () => {
+    const full = JSON.stringify({
+      supplierName: sourced("Acme", "Acme", 1),
+      invoiceNumber: sourced("INV-7", "INV-7", 1),
+      invoiceDate: sourced("2026-10-03", "3 Oct", 1),
+      totalAmount: sourced(99.5, "99.50", 1),
+      currency: sourced("USD", "USD", 1),
+    });
+    addInvoice("full.pdf", null, "ok", full);
+    addInvoice("bad.pdf", "nimbus", "exception", "{nope");
+    const [a, b] = listInvoices(db, 1);
+    expect(a).toMatchObject({
+      supplierName: "Acme",
+      documentNumber: "INV-7",
+      date: "2026-10-03",
+      amount: 99.5,
+      currency: "USD",
+    });
+    expect(b).toMatchObject({ supplierName: "Nimbus", documentNumber: null, amount: null });
+  });
+
+  it("gets one supplier with its facts, or null", () => {
+    db.prepare(
+      "INSERT INTO supplier_facts (supplier_id, fact, value, source_url, quote) VALUES ('orbit','VAT id','DE1','https://example.com','DE1')",
+    ).run();
+    expect(getSupplier(db, "orbit")?.facts).toHaveLength(1);
+    expect(getSupplier(db, "nimbus")?.facts).toEqual([]);
+    expect(getSupplier(db, "nope")).toBeNull();
   });
 });
