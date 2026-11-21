@@ -1,7 +1,7 @@
 "use client";
 // Completes by hand the invoice fields the document did not let us read. One row per field:
 // label and input side by side on desktop, stacked on mobile. Errors appear next to the field.
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { SubmitButton } from "@/components/action-form";
 import { fieldLabel } from "@/components/format";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,9 @@ import { cn } from "cn";
 
 export function UnreadableForm({ exceptionId, fields }: { exceptionId: number; fields: string[] }) {
   const [state, formAction] = useActionState(completeUnreadableFieldsAction, null);
+  // Controlled inputs: React resets uncontrolled form fields after an action, which would wipe
+  // what the person typed when the check returns an error.
+  const [values, setValues] = useState<Record<string, string>>({});
   return (
     <form action={formAction} className="flex flex-col gap-4 border-t border-line pt-5">
       <input type="hidden" name="id" value={exceptionId} />
@@ -33,6 +36,8 @@ export function UnreadableForm({ exceptionId, fields }: { exceptionId: number; f
               <Input
                 id={inputId}
                 name={`field:${f}`}
+                value={values[f] ?? ""}
+                onChange={(ev) => setValues((v) => ({ ...v, [f]: ev.target.value }))}
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? `${inputId}-err` : undefined}
                 className="sm:max-w-sm"
