@@ -28,3 +28,4 @@ data/*.db
 data/*.db-*
 data/collected/
 data/packages/
+data/voice/
