@@ -5,6 +5,8 @@ import {
   deadlineFor,
   daysToDeadline,
   nextClosureLabel,
+  fieldLabel,
+  manualNote,
   today,
   cleanName,
   exceptionLabel,
@@ -102,5 +104,22 @@ describe("today", () => {
       expect(t.demo).toBeNull();
       expect(t.date).toBe(now);
     }
+  });
+});
+
+describe("manual field helpers", () => {
+  it("labels fields and passes unknown ones through", () => {
+    expect(fieldLabel("invoiceNumber")).toBe("Numero fattura");
+    expect(fieldLabel("invoiceDate")).toBe("Data fattura (AAAA-MM-GG)");
+    expect(fieldLabel("somethingElse")).toBe("somethingElse");
+  });
+  it("describes who typed a value and when", () => {
+    expect(manualNote("Maria", "2026-11-21 14:05:00")).toBe(
+      "inserito a mano da Maria il 21/11/2026 15:05",
+    );
+    expect(manualNote("Maria", "2026-11-21T14:05:00.000Z")).toBe(
+      "inserito a mano da Maria il 21/11/2026 15:05",
+    );
+    expect(manualNote(undefined, undefined)).toBe("inserito a mano da una persona");
   });
 });

@@ -181,7 +181,7 @@ const ROME = new Intl.DateTimeFormat("it-IT", {
  */
 export function formatDateTime(value: string | null | undefined): string {
   if (!value) return "—";
-  const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/.exec(value);
+  const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?Z?$/.exec(value);
   if (!m) return value;
   const date = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] ?? 0)));
   const p = Object.fromEntries(ROME.formatToParts(date).map((x) => [x.type, x.value]));
@@ -267,4 +267,24 @@ export function today(
     }
   }
   return { date: now, demo: null };
+}
+
+/** Plain Italian labels of the invoice fields a person can complete by hand. */
+export const FIELD_LABELS: Record<string, string> = {
+  invoiceNumber: "Numero fattura",
+  invoiceDate: "Data fattura (AAAA-MM-GG)",
+  totalAmount: "Importo totale",
+  currency: "Valuta",
+  supplierName: "Fornitore",
+  supplierCountry: "Paese del fornitore",
+  addresseeName: "Intestatario",
+};
+
+export function fieldLabel(field: string): string {
+  return FIELD_LABELS[field] ?? field;
+}
+
+/** "inserito a mano da Maria il 21/11/2026 15:05" for a value typed by a person. */
+export function manualNote(by: string | undefined, at: string | undefined): string {
+  return `inserito a mano da ${by ?? "una persona"}${at ? ` il ${formatDateTime(at)}` : ""}`;
 }

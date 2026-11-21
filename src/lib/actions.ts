@@ -14,6 +14,7 @@ import {
 } from "./compliance";
 import {
   approvePackage,
+  completeUnreadableFields,
   deliverPackage,
   resetDemo,
   resolveException,
@@ -24,6 +25,10 @@ import {
 export interface ActionResult {
   ok: boolean;
   message: string;
+  /** Per-field errors, keyed by field name (forms that complete values by hand). */
+  errors?: Record<string, string>;
+  /** Set by actions that may close an exception. */
+  closed?: boolean;
 }
 
 /** Plain-text message for an error; the pipeline throws until it is implemented. */
@@ -299,5 +304,36 @@ export async function exportAccountingAction(
           message: `Esportate ${r.exported} registrazioni (simulato). Nessun gestionale reale è stato contattato.`,
         }
       : { ok: false, message: r.error ?? "Esportazione simulata non riuscita." };
+  });
+}
+
+/** A person types the fields the document did not let us read; the rules check them again. */
+export async function completeUnreadableFieldsAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const exceptionId = id(formData, "id");
+  const person = cleanName(formData.get("person"));
+  if (!exceptionId) return { ok: false, message: "Eccezione non valida." };
+  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
+  const values: Record<string, string> = {};
+  for (const [key, value] of formData.entries()) {
+    if (key.startsWith("field:") && typeof value === "string") values[key.slice(6)] = value.trim();
+  }
+  return guarded(() => {
+    const r = completeUnreadableFields(getDb(), exceptionId, values, person);
+    return {
+      ok: r.ok,
+      closed: r.closed,
+      errors: r.errors,
+      message:
+        r.message ??
+        (r.ok
+          ? r.closed
+            ? "Valori salvati: l'eccezione è chiusa."
+            : "Valori salvati."
+          : "Non ho potuto salvare i valori."),
+    };
   });
 }

@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { UnreadableForm } from "@/components/unreadable-form";
 import { resolveExceptionAction } from "@/lib/actions";
 import { getDb } from "@/lib/db";
+import { unreadableFields } from "@/lib/pipeline";
 import { listExceptions, type ExceptionRow } from "@/lib/queries";
 import Link from "next/link";
 
@@ -34,6 +36,7 @@ function Subject({ e }: { e: ExceptionRow }) {
 function ExceptionCard({ e }: { e: ExceptionRow }) {
   const label = exceptionLabel(e.code);
   const open = e.status === "open";
+  const unreadable = e.code === "UNREADABLE_FIELD";
   return (
     <Card>
       <CardHeader>
@@ -45,7 +48,7 @@ function ExceptionCard({ e }: { e: ExceptionRow }) {
         <Subject e={e} />
       </CardHeader>
       <CardContent className="flex flex-col gap-5">
-        <p>{e.message || label.explanation}</p>
+        <p>{unreadable && open ? label.explanation : e.message || label.explanation}</p>
         <div className="rounded-[12px] bg-background p-4">
           <p className="eyebrow mb-2">Prova</p>
           {e.evidence ? (
@@ -70,7 +73,9 @@ function ExceptionCard({ e }: { e: ExceptionRow }) {
           <p className="eyebrow mb-2">Cosa propone Probata</p>
           <p>{e.proposedAction ?? "Nessuna proposta: decidi tu."}</p>
         </div>
-        {open ? (
+        {open && unreadable ? (
+          <UnreadableForm exceptionId={e.id} fields={unreadableFields(getDb(), e.id)} />
+        ) : open ? (
           <ActionForm
             action={resolveExceptionAction}
             className="flex flex-col gap-4 border-t border-line pt-5"

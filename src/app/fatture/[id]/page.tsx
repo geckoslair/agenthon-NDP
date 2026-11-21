@@ -1,4 +1,10 @@
-import { channelLabel, exceptionLabel, formatAmount, invoiceStatus } from "@/components/format";
+import {
+  channelLabel,
+  exceptionLabel,
+  formatAmount,
+  invoiceStatus,
+  manualNote,
+} from "@/components/format";
 import { PageHeader } from "@/components/page-header";
 import { StateTag } from "@/components/state-tag";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -119,6 +125,9 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 <li key={key} className="rounded-[14px] border border-line p-4">
                   <p className="text-sm text-ink-2">{label}</p>
                   <p className="font-semibold">{show(key, f, ex.currency?.value ?? null)}</p>
+                  {f.origin === "manual" && (
+                    <p className="text-sm text-ink-2">{manualNote(f.correctedBy, f.correctedAt)}</p>
+                  )}
                 </li>
               );
             })}
