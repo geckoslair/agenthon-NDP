@@ -40,21 +40,33 @@ exceptions and sends nothing without a person's approval. The spec is
 
 ## Code map
 
-| Path                         | What                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------ |
-| `src/lib/types.ts`           | Domain types. Every extracted value carries its quote and page           |
-| `src/lib/rules.ts`           | Deterministic validation, duplicates, completeness. Tested               |
-| `src/lib/db.ts`              | SQLite schema (suppliers, runs, invoices, exceptions, outbox, audit log) |
-| `src/lib/audit.ts`           | Append-only log and the approval gate for outgoing emails. Tested        |
-| `src/lib/gemini.ts`          | Invoice extraction with Gemini on Vertex AI                              |
-| `scripts/extract-invoice.ts` | Smoke test: `npm run extract -- file.pdf 2026-10`                        |
-| `src/app/`                   | Next.js UI. Only a counter page so far                                   |
+| Path                                        | What                                                                                  |
+| ------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `src/lib/types.ts`                          | Domain types. Every extracted value carries its quote and page                        |
+| `src/lib/rules.ts`                          | Deterministic validation, duplicates, completeness                                    |
+| `src/lib/db.ts`                             | SQLite schema and migration                                                           |
+| `src/lib/audit.ts`                          | Append-only log and the approval gate for outgoing emails                             |
+| `src/lib/pipeline/`                         | The monthly run: `runMonth`, `resolveException`, `resetDemo`                          |
+| `src/lib/sources/`                          | The three collection channels: email, billing API, browser (Playwright)               |
+| `src/lib/research/`                         | Billing facts for unknown suppliers, each with source and quote                       |
+| `src/lib/package/`                          | The zip and the summary email for the accountant                                      |
+| `src/lib/extractor.ts`, `src/lib/gemini.ts` | Fixture extractor (default) and live Gemini (`EXTRACTOR=gemini`)                      |
+| `src/lib/voice/`, `src/app/api/brief/`      | Spoken brief with ElevenLabs, cached on disk                                          |
+| `src/lib/queries.ts`, `src/lib/actions.ts`  | Reads and server actions used by the pages                                            |
+| `src/app/`                                  | Pages: overview, `eccezioni`, `approvazioni`, `fornitori`, `registro`, `fatture/[id]` |
+| `src/app/mock/`                             | Fake supplier billing API, dashboard and billing-info pages                           |
+| `demo/2026-10/`                             | The synthetic demo month; `scripts/generate-demo-data.ts` regenerates it              |
 
-Commands: `npm run dev`, `npm test`, `npm run typecheck`, `npm run format`.
+Commands: `npm run dev`, `npm test`, `npm run typecheck`, `npm run format`,
+`npm run run-month -- 2026-10 --reset`, `npm run extract -- file.pdf 2026-10`.
 Run `npm test` and `npm run typecheck` before every push.
 
-Not built yet: the run orchestrator, the exception queue and approval UI,
-the package builder, supplier research, synthetic data, the voice brief.
+Live demo: https://web-production-32589d1c.up.railway.app (Railway project
+`probata`). Pushes to `main` do not redeploy on their own: run `railway up`.
+
+Not built: self-invoice XML and SdI, real mailbox or bank connections, VIES
+lookup, supplier selection at the quoting stage. Sending is simulated. Live
+Gemini extraction works but the demo runs on the fixture extractor.
 
 ## What wins (from the brief)
 

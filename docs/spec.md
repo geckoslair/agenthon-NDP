@@ -68,7 +68,7 @@ a click, and the log records who enabled it. This is off by default, can be
 revoked, and never applies to the monthly package or to free-text emails.
 Implemented in `src/lib/audit.ts` (`queueOutgoing`, `setAutoSend`).
 
-## Exceptions that stop an invoice **[proposed]**
+## Exceptions that stop an invoice **[built]**
 
 All taken from real episodes in `docs/domain.md`.
 
@@ -91,14 +91,15 @@ person. Resolving it is logged with who decided.
 - Sending the package to the accountant.
 - Any outgoing email, unless a person enabled unattended sending for its
   template.
-- Adding or changing a supplier in the registry. **[proposed]**
+- Adding or changing a supplier in the registry. **[not built: researched
+  suppliers are added with status "unknown"]**
 
 ## Audit log **[decided]**
 
 Append-only. One row per step: timestamp, run, invoice or supplier, step,
 input reference, result, source, and for approvals who approved and when.
 
-## Demo data **[proposed]**
+## Demo data **[built]**
 
 Synthetic only: one fictional month with about twenty invoice PDFs in
 different layouts from fictional suppliers, a CSV of card charges, and a
@@ -106,12 +107,12 @@ registry of recurring suppliers. Planted cases: one of each exception above
 and one unknown supplier that the research resolves. No real company,
 person or invoice.
 
-## Voice (ElevenLabs) **[proposed]**
+## Voice (ElevenLabs) **[built]**
 
 A spoken morning brief of the run: how many invoices are ready, what is
 missing, which exceptions wait for a decision. Approval stays a click, not
-a voice command. Stretch: a conversational agent that answers "why is this
-invoice blocked?" from the log.
+a voice command. Not built: a conversational agent that answers "why is
+this invoice blocked?" from the log.
 
 ## Stack **[decided]**
 

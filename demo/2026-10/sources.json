@@ -16,19 +16,11 @@
     "elowen-EL-007.pdf"
   ],
   "billing_api": {
-    "orbit": [
-      "orbit-2026-10.pdf"
-    ],
-    "quill": [
-      "quill-QD-784512.pdf"
-    ]
+    "orbit": ["orbit-2026-10.pdf"],
+    "quill": ["quill-QD-784512.pdf"]
   },
   "browser": {
-    "glyph": [
-      "glyph-R-88.pdf"
-    ],
-    "cobalt": [
-      "cobalt-CCI-55021.pdf"
-    ]
+    "glyph": ["glyph-R-88.pdf"],
+    "cobalt": ["cobalt-CCI-55021.pdf"]
   }
 }
