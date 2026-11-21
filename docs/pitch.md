@@ -5,10 +5,14 @@ summary of the real case: the studio's own time tracking over 25 months
 (November 2024 to November 2026) and its email history. Nothing else is
 quoted. Tax rules are as reported by the accountant, not verified.
 
-## (a) Submission description (max 1000 characters)
+## (a) Submission description (as saved on the portal at 15:33)
+
+Written by the team; 411 characters. In the prototype the submission to
+the tax authorities and the accounting integration are simulated: say so
+if the jury asks.
 
 ```text
-Probata prepares the monthly package of foreign purchase invoices that a small Italian software house gives its accountant. It collects invoices from email, supplier billing APIs and supplier dashboards (browser automation). Gemini 3.8 Flash on Vertex AI reads each value with its source quote and page; rules written in code, not the model, validate every invoice, reconcile it with card charges and check unknown suppliers, answering "unknown" when a fact has no source. It stops at every exception (foreign VAT, wrong month, duplicate, missing or misaddressed invoice, cases outside known rules) and sends nothing without a person's approval. Every step goes to an append-only audit log; ElevenLabs speaks the brief of the run. Sources and sending are simulated on synthetic data; the hosted demo replays stored extractions (live Gemini raised the same 9 exceptions). Pre-existing: none, all built today, brand included. Libraries: Next.js, SQLite, Playwright, shadcn/ui, Vitest.
+Probata simplifies foreign supplier invoicing for Italian SMEs by automating the autofatturazione process. It collects and processes foreign invoices, handles Italian VAT compliance, submits the required documents to the tax authorities, and integrates with accounting software. Probata reduces administrative work, prevents errors, and makes purchasing from international suppliers as simple as buying locally.
 ```
 
 Character count (including spaces): see the check at the end of this file;

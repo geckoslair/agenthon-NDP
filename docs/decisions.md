@@ -29,6 +29,17 @@ it is not decided; ask the humans.
 - **Orchestration:** three parallel agent streams with the ownership and
   interfaces in `docs/contracts.md`.
 
+## Decided (21 November 2026, 15:30)
+
+- **Submission saved on the portal** with the team's own description. It
+  promises self-invoicing ("autofatturazione"), Italian VAT compliance,
+  submission to the tax authorities and accounting integration.
+- **Scope change to match it:** these are added as a clearly labelled
+  simulation: self-invoice drafts (TD17, not fiscally validated), a
+  simulated SdI submission and a simulated accounting export, each behind a
+  person's approval. This reverses the earlier "not today" for the
+  self-invoice XML and SdI.
+
 ## Open
 
 - Where ElevenLabs fits in the product.
