@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { UnreadableForm } from "@/components/unreadable-form";
 import {
+  attachCorrectedDocumentAction,
   excludeInvoiceAction,
   requestCorrectionAction,
   resolveExceptionAction,
@@ -67,30 +68,56 @@ function ExcludeForm({ exceptionId }: { exceptionId: number }) {
 function CorrectionBlock({ exceptionId }: { exceptionId: number }) {
   const status = correctionStatus(getDb(), exceptionId);
   const l = correctionLabel(status.state);
+  const hasRequest = status.state !== "none" && status.state !== "rejected";
   return (
-    <ActionForm action={requestCorrectionAction} className="flex flex-col gap-3">
-      <input type="hidden" name="id" value={exceptionId} />
-      <p className="text-sm text-ink-2">
-        Puoi chiedere al fornitore un documento corretto (simulato: nessuna email parte davvero),
-        oppure escludere la fattura da questa chiusura.
-      </p>
-      {status.state !== "none" && (
-        <p className="flex flex-wrap items-center gap-3">
-          <StateTag label={l.label} tone={l.tone} />
-          {status.message && <span className="text-sm text-ink-2">{status.message}</span>}
-          {status.outboxId && (
-            <Link href="/approvazioni" className="text-sm underline">
-              Vai alle approvazioni
-            </Link>
-          )}
+    <div className="flex flex-col gap-5">
+      <ActionForm action={requestCorrectionAction} className="flex flex-col gap-3">
+        <input type="hidden" name="id" value={exceptionId} />
+        <p className="text-sm text-ink-2">
+          Puoi chiedere al fornitore un documento corretto (simulato: nessuna email parte davvero),
+          oppure escludere la fattura da questa chiusura.
         </p>
+        {status.state !== "none" && (
+          <p className="flex flex-wrap items-center gap-3">
+            <StateTag label={l.label} tone={l.tone} />
+            {status.message && <span className="text-sm text-ink-2">{status.message}</span>}
+            {status.outboxId && (
+              <Link href="/approvazioni" className="text-sm underline">
+                Vai alle approvazioni
+              </Link>
+            )}
+          </p>
+        )}
+        <div>
+          <SubmitButton pendingLabel="Creo la richiesta…" disabled={!l.canRequest}>
+            Richiedi correzione
+          </SubmitButton>
+        </div>
+      </ActionForm>
+      {hasRequest && (
+        <ActionForm action={attachCorrectedDocumentAction} className="flex flex-col gap-3">
+          <input type="hidden" name="id" value={exceptionId} />
+          <Label htmlFor={`doc-${exceptionId}`}>Carica il documento corretto</Label>
+          <input
+            id={`doc-${exceptionId}`}
+            name="file"
+            type="file"
+            accept="application/pdf,.pdf"
+            required
+            className="text-sm"
+          />
+          <p className="text-sm text-ink-2">
+            Probata legge il PDF e controlla di nuovo le regole: la fattura si sblocca solo se il
+            documento corregge davvero il problema. Una nota o un'email non bastano.
+          </p>
+          <div>
+            <SubmitButton variant="outline" pendingLabel="Verifico…">
+              Verifica il documento
+            </SubmitButton>
+          </div>
+        </ActionForm>
       )}
-      <div>
-        <SubmitButton pendingLabel="Creo la richiesta…" disabled={!l.canRequest}>
-          Richiedi correzione
-        </SubmitButton>
-      </div>
-    </ActionForm>
+    </div>
   );
 }
 

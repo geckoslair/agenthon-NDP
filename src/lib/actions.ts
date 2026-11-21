@@ -14,6 +14,7 @@ import {
 } from "./compliance";
 import {
   approvePackage,
+  attachCorrectedDocument,
   requestCorrection,
   excludeInvoice,
   completeUnreadableFields,
@@ -365,5 +366,38 @@ export async function requestCorrectionAction(
         ? "La richiesta c'è già: non ne creo un'altra."
         : "Richiesta creata. Il messaggio al fornitore aspetta la tua approvazione (invio simulato).",
     };
+  });
+}
+
+const MAX_UPLOAD_BYTES = 1_000_000;
+
+/** Attaches the corrected PDF received from the supplier; the rules decide whether it remedies. */
+export async function attachCorrectedDocumentAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const exceptionId = id(formData, "id");
+  const file = formData.get("file");
+  if (!exceptionId) return { ok: false, message: "Eccezione non valida." };
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, message: "Scegli il PDF del documento corretto." };
+  }
+  if (!/\.pdf$/i.test(file.name) && file.type !== "application/pdf") {
+    return { ok: false, message: "Il documento deve essere un PDF." };
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    return { ok: false, message: "Il PDF è troppo grande per la demo (massimo 1 MB)." };
+  }
+  return guarded(async () => {
+    const bytes = Buffer.from(await file.arrayBuffer());
+    const r = await attachCorrectedDocument(
+      getDb(),
+      exceptionId,
+      file.name,
+      bytes,
+      currentUser().name,
+    );
+    return { ok: r.ok, closed: r.resolved, message: r.message };
   });
 }
