@@ -5,14 +5,21 @@ import { revalidatePath } from "next/cache";
 import { cleanName } from "@/components/format";
 import { decideOutgoing, markSent, setAutoSend } from "./audit";
 import { getDb } from "./db";
-import { DEFAULT_MONTH, getLatestRun } from "./queries";
+import { DEFAULT_MONTH, getLatestRun, getOutbox } from "./queries";
 import {
   decideSelfInvoice,
   exportToAccounting,
   setEuroAmount,
   submitSelfInvoice,
 } from "./compliance";
-import { resetDemo, resolveException, runMonth } from "./pipeline";
+import {
+  approvePackage,
+  deliverPackage,
+  resetDemo,
+  resolveException,
+  runMonth,
+  setDeliveryMode,
+} from "./pipeline";
 
 export interface ActionResult {
   ok: boolean;
@@ -62,7 +69,7 @@ export async function runMonthAction(
     const summary = await runMonth(db, month);
     return {
       ok: true,
-      message: `Giro completato: ${summary.invoices} fatture, ${summary.exceptions} eccezioni, ${summary.pendingApprovals} invii da approvare.`,
+      message: `Chiusura completata: ${summary.invoices} fatture, ${summary.exceptions} eccezioni, ${summary.pendingApprovals} invii da approvare.`,
     };
   });
 }
@@ -110,14 +117,57 @@ export async function decideOutgoingAction(
     return { ok: false, message: "Decisione non valida." };
   }
   if (!person) return { ok: false, message: "Scrivi il tuo nome." };
-  return guarded(() =>
-    decideOutgoing(getDb(), outboxId, decision, person)
-      ? {
-          ok: true,
-          message: decision === "approved" ? "Invio approvato." : "Invio rifiutato.",
-        }
-      : { ok: false, message: "Questo invio non è più in attesa." },
-  );
+  return guarded(() => {
+    const db = getDb();
+    if (decision === "approved" && getOutbox(db, outboxId)?.kind === "package") {
+      const r = approvePackage(db, outboxId, person);
+      return r.ok
+        ? { ok: true, message: "Pacchetto approvato." }
+        : { ok: false, message: r.error ?? "Il pacchetto non si può approvare." };
+    }
+    return decideOutgoing(db, outboxId, decision, person)
+      ? { ok: true, message: decision === "approved" ? "Invio approvato." : "Invio rifiutato." }
+      : { ok: false, message: "Questo invio non è più in attesa." };
+  });
+}
+
+/** Approves the package even though supplier requests are unanswered: always explicit. */
+export async function approvePackageForceAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const outboxId = id(formData, "id");
+  const person = cleanName(formData.get("person"));
+  if (!outboxId) return { ok: false, message: "Invio non valido." };
+  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
+  return guarded(() => {
+    const r = approvePackage(getDb(), outboxId, person, { force: true });
+    return r.ok
+      ? { ok: true, message: "Pacchetto approvato senza le fatture in attesa." }
+      : { ok: false, message: r.error ?? "Il pacchetto non si può approvare." };
+  });
+}
+
+export async function setDeliveryModeAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const mode = text(formData, "mode");
+  const person = cleanName(formData.get("person"));
+  if (mode !== "accountant" && mode !== "erp") return { ok: false, message: "Scelta non valida." };
+  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
+  return guarded(() => {
+    setDeliveryMode(getDb(), mode, person);
+    return {
+      ok: true,
+      message:
+        mode === "erp"
+          ? "Destinazione: gestionale / ERP diretto (simulato)."
+          : "Destinazione: commercialista, pacchetto via email.",
+    };
+  });
 }
 
 export async function markSentAction(
@@ -127,11 +177,23 @@ export async function markSentAction(
   void _prev;
   const outboxId = id(formData, "id");
   if (!outboxId) return { ok: false, message: "Invio non valido." };
-  return guarded(() =>
-    markSent(getDb(), outboxId)
+  return guarded(async () => {
+    const db = getDb();
+    if (getOutbox(db, outboxId)?.kind === "package") {
+      const r = await deliverPackage(db, outboxId);
+      if (!r.ok) return { ok: false, message: r.error ?? "Consegna non riuscita." };
+      return {
+        ok: true,
+        message:
+          r.mode === "erp"
+            ? `Consegnato al gestionale (simulato). Riferimento ${r.ref ?? "—"}. Nessun gestionale reale è stato contattato.`
+            : "Segnato come inviato al commercialista. L'invio è simulato: nessuna email è partita.",
+      };
+    }
+    return markSent(db, outboxId)
       ? { ok: true, message: "Segnato come inviato. L'invio è simulato: nessuna email è partita." }
-      : { ok: false, message: "Si possono inviare solo gli invii approvati." },
-  );
+      : { ok: false, message: "Si possono inviare solo gli invii approvati." };
+  });
 }
 
 export async function setAutoSendAction(
@@ -229,7 +291,7 @@ export async function exportAccountingAction(
   return guarded(async () => {
     const db = getDb();
     const run = getLatestRun(db);
-    if (!run) return { ok: false, message: "Non c'è ancora un giro." };
+    if (!run) return { ok: false, message: "Non c'è ancora una chiusura." };
     const r = await exportToAccounting(db, run.id, person);
     return r.ok
       ? {

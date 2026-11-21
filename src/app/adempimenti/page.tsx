@@ -208,8 +208,8 @@ export default function CompliancePage() {
       {rows.length === 0 ? (
         <p className="text-ink-2">
           {run
-            ? "Nessuna autofattura per questo giro: serve almeno una fattura valida."
-            : "Nessun giro ancora. Avvia il giro del mese dalla panoramica."}
+            ? "Nessuna autofattura per questa chiusura: serve almeno una fattura valida."
+            : "Nessuna chiusura ancora. Avvia la chiusura dalla panoramica."}
         </p>
       ) : (
         <ul className="flex flex-col gap-5">

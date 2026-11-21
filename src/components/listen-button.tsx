@@ -3,7 +3,15 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export function ListenButton({ detail = false }: { detail?: boolean }) {
+export function ListenButton({
+  detail = false,
+  label,
+  size = "default",
+}: {
+  detail?: boolean;
+  label?: string;
+  size?: "default" | "sm";
+}) {
   const audio = useRef<HTMLAudioElement | null>(null);
   const [state, setState] = useState<"idle" | "loading" | "playing">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -36,14 +44,20 @@ export function ListenButton({ detail = false }: { detail?: boolean }) {
 
   return (
     <div className="flex flex-col items-start gap-2">
-      <Button type="button" variant="secondary" onClick={listen} disabled={state === "loading"}>
+      <Button
+        type="button"
+        variant="secondary"
+        size={size}
+        onClick={listen}
+        disabled={state === "loading"}
+      >
         {state === "loading"
           ? "Preparo l'audio…"
           : state === "playing"
             ? "Ferma"
             : detail
               ? "Ascolta il dettaglio"
-              : "Ascolta il brief"}
+              : (label ?? "Ascolta il brief")}
       </Button>
       {error && (
         <p role="status" className="text-sm font-semibold text-bad">

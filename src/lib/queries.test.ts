@@ -9,6 +9,9 @@ import {
   DEFAULT_MONTH,
   listAudit,
   getSupplier,
+  getOutbox,
+  getRunForMonth,
+  listMonths,
   listSelfInvoices,
   getSelfInvoice,
   getComplianceCounts,
@@ -401,5 +404,43 @@ describe("invoice table rows and supplier detail", () => {
     expect(getSupplier(db, "orbit")?.facts).toHaveLength(1);
     expect(getSupplier(db, "nimbus")?.facts).toEqual([]);
     expect(getSupplier(db, "nope")).toBeNull();
+  });
+});
+
+describe("months", () => {
+  it("lists months with a closure and picks the run of a month", () => {
+    db.prepare("INSERT INTO runs (month) VALUES ('2026-10')").run();
+    db.prepare("INSERT INTO runs (month) VALUES ('2026-09')").run();
+    expect(listMonths(db)).toEqual(["2026-10", "2026-09"]);
+    expect(getRunForMonth(db, "2026-10")?.id).toBe(2);
+    expect(getRunForMonth(db, "2026-09")?.id).toBe(3);
+    expect(getRunForMonth(db, "2025-01")).toBeNull();
+    expect(getRunForMonth(db)?.id).toBe(3);
+    expect(getOverview(db, "2026-09").run?.id).toBe(3);
+    expect(getOverview(db, "2025-01").run).toBeNull();
+    expect(listMonths(openDb(":memory:"))).toEqual([]);
+  });
+
+  it("scopes compliance counts to a run", () => {
+    const inv = addInvoice("m.pdf", "nimbus", "ok");
+    db.prepare(
+      "INSERT INTO self_invoices (run_id, invoice_id, number, taxable_eur, vat_rate, vat_eur, status) VALUES (1, ?, 'AF-m', 1, 22, 0.22, 'draft')",
+    ).run(inv);
+    db.prepare("INSERT INTO runs (month) VALUES ('2026-11')").run();
+    expect(getComplianceCounts(db).drafts).toBe(0);
+    expect(getComplianceCounts(db, 1).drafts).toBe(1);
+  });
+});
+
+describe("getOutbox", () => {
+  it("returns one outgoing email or null", () => {
+    const { id } = queueOutgoing(db, {
+      kind: "package",
+      recipient: "a@example.com",
+      subject: "s",
+      body: "b",
+    });
+    expect(getOutbox(db, id)).toMatchObject({ kind: "package", status: "pending" });
+    expect(getOutbox(db, 999)).toBeNull();
   });
 });

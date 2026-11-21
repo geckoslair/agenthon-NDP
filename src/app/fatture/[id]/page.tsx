@@ -56,6 +56,17 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         </span>
       </div>
 
+      <p className="mb-10">
+        <a
+          href={`/fatture/${inv.id}/pdf`}
+          target="_blank"
+          rel="noreferrer"
+          className="font-semibold underline"
+        >
+          Apri la fattura originale
+        </a>
+      </p>
+
       {exceptions.length > 0 && (
         <section aria-labelledby="exc" className="mb-12 flex flex-col gap-4">
           <h2 id="exc">Eccezioni</h2>
@@ -108,16 +119,6 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 <li key={key} className="rounded-[14px] border border-line p-4">
                   <p className="text-sm text-ink-2">{label}</p>
                   <p className="font-semibold">{show(key, f, ex.currency?.value ?? null)}</p>
-                  {f.quote ? (
-                    <blockquote className="mt-2 font-serif text-lg leading-snug">
-                      “{f.quote}”
-                      <footer className="mt-1 font-sans text-sm text-ink-2">
-                        {f.page ? `pagina ${f.page}` : "pagina non indicata"}
-                      </footer>
-                    </blockquote>
-                  ) : (
-                    <p className="mt-1 text-sm text-ink-2">Nessuna citazione: dato non letto.</p>
-                  )}
                 </li>
               );
             })}

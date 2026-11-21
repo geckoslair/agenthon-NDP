@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   actorLabel,
   channelLabel,
+  deadlineFor,
+  daysToDeadline,
+  nextClosureLabel,
   cleanName,
   exceptionLabel,
   formatAmount,
@@ -62,5 +65,24 @@ describe("format helpers", () => {
     expect(selfInvoiceStatus("submitted").label).toContain("simulata");
     expect(selfInvoiceStatus("rejected").tone).toBe("bad");
     expect(selfInvoiceStatus("x").tone).toBe("neutral");
+  });
+});
+
+describe("deadline helpers", () => {
+  it("computes days to the 15th of the month after the closure month", () => {
+    expect(deadlineFor("2026-10")?.toISOString().slice(0, 10)).toBe("2026-11-15");
+    expect(deadlineFor("2026-12")?.toISOString().slice(0, 10)).toBe("2027-01-15");
+    expect(deadlineFor("bad")).toBeNull();
+    expect(daysToDeadline("2026-10", new Date("2026-11-10T09:00:00Z"))).toBe(5);
+    expect(daysToDeadline("2026-10", new Date("2026-11-15T23:00:00Z"))).toBe(0);
+    expect(daysToDeadline("2026-10", new Date("2026-11-21T10:00:00Z"))).toBe(-6);
+    expect(daysToDeadline("x", new Date())).toBeNull();
+  });
+
+  it("finds the next closure date, the 3rd, strictly after today", () => {
+    expect(nextClosureLabel(new Date("2026-11-21T10:00:00Z"))).toBe("3 dicembre 2026");
+    expect(nextClosureLabel(new Date("2026-11-01T10:00:00Z"))).toBe("3 novembre 2026");
+    expect(nextClosureLabel(new Date("2026-11-03T10:00:00Z"))).toBe("3 dicembre 2026");
+    expect(nextClosureLabel(new Date("2026-12-20T10:00:00Z"))).toBe("3 gennaio 2027");
   });
 });

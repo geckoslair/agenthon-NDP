@@ -41,7 +41,7 @@ export default async function AuditPage({
         title="Cosa è successo, e chi l'ha fatto"
         lead="Ogni passo è scritto qui: l'azione, su quale dato e chi l'ha approvata. Il registro non si modifica."
       />
-      <nav aria-label="Filtra per giro" className="mb-8 flex flex-wrap gap-2">
+      <nav aria-label="Filtra per chiusura" className="mb-8 flex flex-wrap gap-2">
         <Link
           href="/registro"
           className={chip(runId === null)}
@@ -56,7 +56,7 @@ export default async function AuditPage({
             className={chip(runId === r.id)}
             aria-current={runId === r.id ? "page" : undefined}
           >
-            Giro {r.id} · {r.month}
+            Chiusura {r.id} · {r.month}
           </Link>
         ))}
       </nav>

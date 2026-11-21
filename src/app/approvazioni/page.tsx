@@ -7,13 +7,19 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { decideOutgoingAction, markSentAction } from "@/lib/actions";
+import {
+  approvePackageForceAction,
+  decideOutgoingAction,
+  markSentAction,
+  setDeliveryModeAction,
+} from "@/lib/actions";
 import { getDb } from "@/lib/db";
+import { getDeliveryMode, packageBlockers } from "@/lib/pipeline";
 import { listAutoSend, listOutbox, type OutboxRow } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-function OutboxCard({ m }: { m: OutboxRow }) {
+function OutboxCard({ m, mode }: { m: OutboxRow; mode: "accountant" | "erp" }) {
   const s = outboxStatus(m.status);
   return (
     <Card className={m.kind === "package" ? "border-foreground shadow-[var(--shadow)]" : undefined}>
@@ -73,7 +79,13 @@ function OutboxCard({ m }: { m: OutboxRow }) {
               {formatDateTime(m.approvedAt)}. L'invio è simulato: nessuna email parte davvero.
             </p>
             <div>
-              <SubmitButton pendingLabel="Invio…">Invia</SubmitButton>
+              <SubmitButton pendingLabel="Invio…">
+                {m.kind === "package"
+                  ? mode === "erp"
+                    ? "Consegna al gestionale (simulato)"
+                    : "Invia al commercialista (simulato)"
+                  : "Invia"}
+              </SubmitButton>
             </div>
           </ActionForm>
         )}
@@ -96,6 +108,15 @@ export default function ApprovalsPage() {
   const approved = listOutbox(db, "approved");
   const done = listOutbox(db, "done");
   const policies = listAutoSend(db);
+  const mode = getDeliveryMode(db);
+  // A pending package with unanswered supplier requests is not offered for approval.
+  const blocked = new Map<number, string[]>();
+  for (const m of pending) {
+    if (m.kind !== "package" || m.runId === null) continue;
+    const b = packageBlockers(db, m.runId);
+    if (b.length > 0) blocked.set(m.id, [...new Set(b.map((x) => x.supplierName))]);
+  }
+  const approvable = pending.filter((m) => !blocked.has(m.id));
   return (
     <>
       <PageHeader
@@ -104,11 +125,77 @@ export default function ApprovalsPage() {
         lead="Niente lascia l'azienda senza il tuo sì. Leggi il messaggio per intero, poi approva o rifiuta."
       />
 
+      <section aria-labelledby="dest" className="mb-12 flex flex-col gap-4">
+        <h2 id="dest">Dove va il pacchetto</h2>
+        <p>
+          Destinazione attuale:{" "}
+          <strong>
+            {mode === "erp"
+              ? "Gestionale / ERP diretto (simulato), ad esempio Fatture in Cloud"
+              : "Commercialista (pacchetto via email)"}
+          </strong>
+          . La scelta è tua; nulla parte senza la tua approvazione.
+        </p>
+        <ActionForm action={setDeliveryModeAction} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2 sm:max-w-xs">
+            <Label htmlFor="who-mode">Il tuo nome</Label>
+            <Input id="who-mode" name="person" required maxLength={80} />
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <SubmitButton
+              name="mode"
+              value="accountant"
+              variant={mode === "accountant" ? "default" : "outline"}
+              pendingLabel="Salvo…"
+            >
+              Commercialista (pacchetto via email)
+            </SubmitButton>
+            <SubmitButton
+              name="mode"
+              value="erp"
+              variant={mode === "erp" ? "default" : "outline"}
+              pendingLabel="Salvo…"
+            >
+              Gestionale / ERP diretto (simulato), ad esempio Fatture in Cloud
+            </SubmitButton>
+          </div>
+        </ActionForm>
+      </section>
+
+      {[...blocked.entries()].map(([outboxId, names]) => (
+        <section
+          key={outboxId}
+          aria-label="Pacchetto in attesa"
+          className="mb-8 rounded-[14px] border border-warn p-5"
+        >
+          <p>
+            <StateTag label="In attesa" tone="warn" />{" "}
+            <strong>Pacchetto in attesa: manca la risposta di {names.join(", ")}.</strong>
+          </p>
+          <p className="mt-2 text-ink-2">
+            Il pacchetto non è tra le cose da approvare finché i fornitori non rispondono. Puoi
+            anche inviarlo comunque, senza queste fatture.
+          </p>
+          <ActionForm action={approvePackageForceAction} className="mt-4 flex flex-col gap-4">
+            <input type="hidden" name="id" value={outboxId} />
+            <div className="flex flex-col gap-2 sm:max-w-xs">
+              <Label htmlFor={`who-force-${outboxId}`}>Il tuo nome</Label>
+              <Input id={`who-force-${outboxId}`} name="person" required maxLength={80} />
+            </div>
+            <div>
+              <SubmitButton variant="outline" pendingLabel="Salvo…">
+                Invia comunque senza queste fatture
+              </SubmitButton>
+            </div>
+          </ActionForm>
+        </section>
+      ))}
+
       <section aria-labelledby="pending" className="flex flex-col gap-5">
-        <h2 id="pending">In attesa di approvazione ({pending.length})</h2>
-        {pending.length === 0 && <p className="text-ink-2">Niente da approvare.</p>}
-        {pending.map((m) => (
-          <OutboxCard key={m.id} m={m} />
+        <h2 id="pending">In attesa di approvazione ({approvable.length})</h2>
+        {approvable.length === 0 && <p className="text-ink-2">Niente da approvare.</p>}
+        {approvable.map((m) => (
+          <OutboxCard key={m.id} m={m} mode={mode} />
         ))}
       </section>
 
@@ -119,7 +206,7 @@ export default function ApprovalsPage() {
         <h2 id="approved">Approvate, da inviare ({approved.length})</h2>
         {approved.length === 0 && <p className="text-ink-2">Nessun invio approvato in attesa.</p>}
         {approved.map((m) => (
-          <OutboxCard key={m.id} m={m} />
+          <OutboxCard key={m.id} m={m} mode={mode} />
         ))}
       </section>
 
@@ -163,7 +250,7 @@ export default function ApprovalsPage() {
         >
           <h2 id="done">Chiuse ({done.length})</h2>
           {done.map((m) => (
-            <OutboxCard key={m.id} m={m} />
+            <OutboxCard key={m.id} m={m} mode={mode} />
           ))}
         </section>
       )}

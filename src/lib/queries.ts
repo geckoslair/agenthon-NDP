@@ -63,11 +63,28 @@ export interface Overview {
   warnings: string[];
 }
 
-export function getOverview(db: Db): Overview {
-  const run = getLatestRun(db);
+/** Months that have a closure (a run), newest first. */
+export function listMonths(db: Db): string[] {
+  return (
+    db.prepare("SELECT month FROM runs GROUP BY month ORDER BY month DESC").all() as {
+      month: string;
+    }[]
+  ).map((r) => r.month);
+}
+
+/** Latest run of a month, or the latest run overall when no month is given. */
+export function getRunForMonth(db: Db, month?: string | null): RunRow | null {
+  if (!month) return getLatestRun(db);
+  const r = db.prepare("SELECT * FROM runs WHERE month = ? ORDER BY id DESC LIMIT 1").get(month) as
+    RunDbRow | undefined;
+  return r ? toRun(r) : null;
+}
+
+export function getOverview(db: Db, month?: string | null): Overview {
+  const run = getRunForMonth(db, month);
   if (!run) {
     return {
-      month: DEFAULT_MONTH,
+      month: month ?? DEFAULT_MONTH,
       run: null,
       channels: [],
       collected: 0,
@@ -660,8 +677,8 @@ export interface ComplianceCounts {
 }
 
 /** Counts for the overview tile, for the latest run. */
-export function getComplianceCounts(db: Db): ComplianceCounts {
-  const rows = listSelfInvoices(db);
+export function getComplianceCounts(db: Db, runId?: number): ComplianceCounts {
+  const rows = listSelfInvoices(db, runId);
   const n = (s: SelfInvoiceRow["status"]) => rows.filter((r) => r.status === s).length;
   return {
     needsInput: n("needs_input"),
@@ -670,4 +687,9 @@ export function getComplianceCounts(db: Db): ComplianceCounts {
     submitted: n("submitted"),
     exported: rows.filter((r) => r.accountingStatus === "exported").length,
   };
+}
+
+export function getOutbox(db: Db, id: number): OutboxRow | null {
+  const r = db.prepare("SELECT * FROM outbox WHERE id = ?").get(id) as OutboxDbRow | undefined;
+  return r ? toOutbox(r) : null;
 }

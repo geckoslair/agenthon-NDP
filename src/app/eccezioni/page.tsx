@@ -54,6 +54,18 @@ function ExceptionCard({ e }: { e: ExceptionRow }) {
             <p className="text-ink-2">Nessuna prova registrata: non lo sappiamo.</p>
           )}
         </div>
+        {e.invoiceId && (
+          <p>
+            <a
+              href={`/fatture/${e.invoiceId}/pdf`}
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold underline"
+            >
+              Apri la fattura originale
+            </a>
+          </p>
+        )}
         <div>
           <p className="eyebrow mb-2">Cosa propone Probata</p>
           <p>{e.proposedAction ?? "Nessuna proposta: decidi tu."}</p>
@@ -99,7 +111,7 @@ export default function ExceptionsPage() {
       <PageHeader
         eyebrow="Eccezioni"
         title="Cosa si è fermato"
-        lead="Ogni eccezione blocca il giro finché una persona decide. Leggi la prova, poi scrivi cosa hai fatto."
+        lead="Ogni eccezione blocca la chiusura finché una persona decide. Leggi la prova, poi scrivi cosa hai fatto."
       />
       <Tabs defaultValue="open">
         <TabsList>

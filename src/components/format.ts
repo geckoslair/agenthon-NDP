@@ -22,7 +22,7 @@ export const EXCEPTION_LABELS: Record<ExceptionCode, ExceptionLabel> = {
   },
   WRONG_MONTH: {
     title: "Mese diverso",
-    explanation: "La data della fattura non cade nel mese del giro.",
+    explanation: "La data della fattura non cade nel mese della chiusura.",
   },
   NOT_FOREIGN: {
     title: "Fornitore non estero",
@@ -220,4 +220,33 @@ export function selfInvoiceStatus(status: string): { label: string; tone: Tone }
     default:
       return { label: status, tone: "neutral" };
   }
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Deadline for the closure month "YYYY-MM": the 15th of the following month (as UTC midnight). */
+export function deadlineFor(month: string): Date | null {
+  const m = /^(\d{4})-(0[1-9]|1[0-2])$/.exec(month);
+  if (!m) return null;
+  return new Date(Date.UTC(+m[1], +m[2], 15)); // month index +m[2] is the next month
+}
+
+/** Whole days from `today` to the deadline of `month`; negative when it has passed. */
+export function daysToDeadline(month: string, today: Date): number | null {
+  const d = deadlineFor(month);
+  if (!d) return null;
+  const t = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  return Math.round((d.getTime() - t) / DAY_MS);
+}
+
+/** Next 3rd of a month strictly after `today`, as "3 dicembre 2026". */
+export function nextClosureLabel(today: Date): string {
+  let y = today.getUTCFullYear();
+  let mo = today.getUTCMonth();
+  if (today.getUTCDate() >= 3) mo += 1;
+  if (mo > 11) {
+    mo = 0;
+    y += 1;
+  }
+  return `3 ${MONTHS[mo]} ${y}`;
 }
