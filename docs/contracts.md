@@ -74,3 +74,26 @@ may depend on a live model call: it has never been run in this project.
 `src/lib/pipeline/index.ts`: `runMonth`, `resolveException`, `resetDemo`.
 `src/lib/audit.ts`: `decideOutgoing`, `markSent`, `setAutoSend`.
 The Interface reads the database directly through `src/lib/queries.ts`.
+
+## Conventions agreed between Pipeline and Data (14:50)
+
+1. The supplier id of a file is the part of `fileName` before the first `-`
+   (`nimbus-INV-1001.pdf` → `nimbus`). An unknown supplier's public page is
+   `/mock/portal/<that id>/billing-info`.
+2. On `billing-info` each fact is an element with `data-fact="<name>"` and
+   `data-value="<value>"`; its text content is the verbatim quote. Fact
+   names: `legal_entity`, `country`, `tax_id`, `reverse_charge` (yes/no),
+   `company_addressee` (yes/no), `currency`, `invoice_channel`
+   (email|dashboard|api). A missing element means the fact is unknown.
+3. Portal login: `/mock/portal/<id>` has `input[name=username]`,
+   `input[name=password]` and a submit button. After login the invoices page
+   is `/mock/portal/<id>/invoices`, with `<a href="...pdf">` links. PDFs may
+   be served without a cookie.
+4. The pipeline reads `sources.json` only for which supplier ids use
+   `billing_api` or `browser` (the keys), not to pick files.
+5. `OUT_OF_KNOWN_RULES`: the truth JSON has `supplierTaxId.value = null` and
+   a `supplierCountry` outside the EU.
+6. The unknown supplier whose facts can be found raises no exception in
+   `expected.json`; the other raises `SUPPLIER_FACTS_UNKNOWN` only.
+7. `MISSING_EXPECTED_INVOICE` entries in `expected.json` use
+   `"fileName": null` and add `"supplierId"`.
