@@ -43,7 +43,7 @@ export interface RunOptions {
   /** Channels to use; defaults to env SOURCES (comma list) or all three. */
   sources?: SourceKind[];
   fetchImpl?: typeof fetch;
-  /** Replace the channel adapters entirely (tests). */
+  /** Replace a channel adapter (tests); returning null keeps the default one. */
   sourceFactory?: (kind: SourceKind, ctx: SourceContext) => InvoiceSource | null;
 }
 
@@ -57,6 +57,25 @@ export interface SourceContext {
 }
 
 const ACTOR = "autopilot";
+
+/**
+ * A card charge description ("ORBIT ANALYTICS DUBLIN IE") belongs to a supplier when it
+ * contains the supplier id or the first word of its name.
+ */
+export function chargeMatchesSupplier(description: string, supplier: Supplier): boolean {
+  const words = description
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+  const first = supplier.name
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)[0];
+  return (
+    words.includes(supplier.id.toLowerCase()) ||
+    (!!first && first.length > 2 && words.includes(first))
+  );
+}
 
 function readJson<T>(file: string): T {
   return JSON.parse(fs.readFileSync(file, "utf8")) as T;
@@ -232,10 +251,7 @@ export async function runMonth(
       fetchImpl: options.fetchImpl,
     };
     try {
-      const source = options.sourceFactory
-        ? options.sourceFactory(kind, ctx)
-        : defaultSource(kind, ctx);
-      if (!source) continue;
+      const source = options.sourceFactory?.(kind, ctx) ?? defaultSource(kind, ctx);
       const docs = await source.collect(month);
       for (const w of (source as { warnings?: string[] }).warnings ?? []) warn(w, kind);
       for (const doc of docs) {
@@ -251,12 +267,13 @@ export async function runMonth(
   // 2. Extract, store, match.
   const extractor = getExtractor(path.join(monthDir, "truth"));
   const insertInvoice = db.prepare(
-    "INSERT INTO invoices (run_id, file_name, supplier_id, extracted, status) VALUES (?, ?, ?, ?, 'ok')",
+    "INSERT INTO invoices (run_id, file_name, supplier_id, extracted, status, source, origin) VALUES (?, ?, ?, ?, 'ok', ?, ?)",
   );
   const items: WorkItem[] = [];
   const supplierIdFor = (doc: CollectedDocument) =>
     doc.supplierId ?? supplierIdFromFileName(doc.fileName);
-  for (const doc of [...collected.values()].sort((a, b) => a.fileName.localeCompare(b.fileName))) {
+  // Collection order is kept: the first copy of a duplicate is the original.
+  for (const doc of collected.values()) {
     let extracted: ExtractedInvoice | null = null;
     try {
       extracted = await extractor.extract(doc);
@@ -277,8 +294,14 @@ export async function runMonth(
     }
     const supplierId = supplier?.id ?? null;
     const invoiceId = Number(
-      insertInvoice.run(runId, doc.fileName, supplierId, JSON.stringify(extracted ?? {}))
-        .lastInsertRowid,
+      insertInvoice.run(
+        runId,
+        doc.fileName,
+        supplierId,
+        JSON.stringify(extracted ?? {}),
+        doc.source,
+        doc.origin,
+      ).lastInsertRowid,
     );
     log(
       supplier ? "supplier_matched" : "supplier_unknown",
@@ -343,9 +366,12 @@ export async function runMonth(
     for (const e of found)
       if (e.code !== "UNREADABLE_FIELD") raise(e.code, item, item.supplierId, e.evidence);
 
-    // A private individual outside the EU is outside the rules we know.
+    // A private individual outside the EU is outside the rules we know: a registry
+    // supplier with no tax identifier anywhere. Unknown suppliers go to research instead.
     const country = item.extracted.supplierCountry.value?.toUpperCase() ?? null;
     if (
+      item.supplier !== null &&
+      !item.supplier.taxId &&
       item.extracted.supplierTaxId.value === null &&
       country !== null &&
       !EU_COUNTRIES.has(country)
@@ -464,8 +490,8 @@ export async function runMonth(
   const missingSuppliers = new Set<string>();
   for (const m of completeness.missingFromSuppliers) {
     missingSuppliers.add(m.supplier.id);
-    const related = completeness.unmatchedCharges.filter(
-      (c) => matchSupplier(c.description, [m.supplier]) !== null,
+    const related = completeness.unmatchedCharges.filter((c) =>
+      chargeMatchesSupplier(c.description, m.supplier),
     );
     const chargeText = related.map(
       (c) => `addebito ${c.date} ${c.description} ${c.amount} ${c.currency}`,
@@ -480,7 +506,7 @@ export async function runMonth(
     );
   }
   for (const c of completeness.unmatchedCharges) {
-    const s = matchSupplier(c.description, registry);
+    const s = registry.find((x) => chargeMatchesSupplier(c.description, x)) ?? null;
     if (s && missingSuppliers.has(s.id)) continue;
     raise(
       "MISSING_EXPECTED_INVOICE",

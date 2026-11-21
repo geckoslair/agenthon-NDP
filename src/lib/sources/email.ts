@@ -60,7 +60,7 @@ export function createEmailSource(options: EmailSourceOptions): InvoiceSource & 
       const files = fs
         .readdirSync(options.inboxDir)
         .filter((f) => f.toLowerCase().endsWith(".eml"))
-        .sort();
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
       const documents: CollectedDocument[] = [];
       for (const file of files) {
         try {

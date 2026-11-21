@@ -63,7 +63,9 @@ export function createBillingApiSource(options: BillingApiSourceOptions): Invoic
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const list = parseInvoiceList(await response.json());
           for (const invoice of list) {
-            const pdfUrl = new URL(invoice.pdfUrl, options.baseUrl).toString();
+            const url = new URL(invoice.pdfUrl, options.baseUrl);
+            if (!url.searchParams.has("month")) url.searchParams.set("month", month);
+            const pdfUrl = url.toString();
             const fileName = safeFileName(path.basename(new URL(pdfUrl).pathname));
             if (!isMissing(fileName)) continue;
             const pdf = await doFetch(pdfUrl, { headers, signal: AbortSignal.timeout(timeoutMs) });

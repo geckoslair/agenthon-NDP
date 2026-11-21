@@ -42,7 +42,7 @@ describe("runMonth on fixtures", () => {
     expect(got).toEqual(
       [
         "glyph:MISSING_EXPECTED_INVOICE",
-        "nimbus-INV-1001.pdf:DUPLICATE",
+        "nimbus-INV-1001-copy.pdf:DUPLICATE",
         "person-5.pdf:ADDRESSED_TO_PERSON",
         "shadow-9.pdf:SUPPLIER_FACTS_UNKNOWN",
         "vatco-77.pdf:FOREIGN_VAT_CHARGED",
