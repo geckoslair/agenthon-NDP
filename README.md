@@ -109,12 +109,12 @@ Google variables in `.env`, and log in with
 
 ## Spoken brief (ElevenLabs)
 
-The overview has a card "Brief del giro": the text is built from the database
-(counts per channel, ready invoices, each open exception, what is missing,
-what waits for approval) and the button **Ascolta il brief** reads a 15-second summary aloud (totals, open exceptions by kind, what waits for approval); **Ascolta il dettaglio** reads the full per-invoice text, about a minute.
+The overview has a button **Ascolta il riepilogo**: it reads aloud a
+15-second summary built from the database (totals, open exceptions by kind,
+what waits for approval).
 It only reads: it approves and sends nothing. Set `ELEVENLABS_API_KEY` in
 `.env`; optional `ELEVENLABS_VOICE_ID` and `ELEVENLABS_MODEL`. Without a key
-the route `/api/brief/audio` answers 503 and the card shows the text only.
+the route `/api/brief/audio` answers 503.
 Audio is cached in `data/voice/` (git-ignored) by a hash of the text, so
 repeating the same brief costs nothing.
 
@@ -127,8 +127,8 @@ the list of exceptions the run must raise
 ([`demo/2026-10/README.md`](demo/2026-10/README.md)).
 
 Start the app (`npm run dev`), open <http://localhost:3000>, press
-**Avvia il giro del mese**, then go through **Eccezioni** and
-**Approvazioni**. **Ripristina demo** starts again from scratch.
+**Avvia la chiusura**, then go through **Eccezioni**, **Approvazioni** and
+**Adempimenti**. **Ripristina demo** starts again from scratch.
 
 From the terminal, with the app running as the mock supplier server:
 

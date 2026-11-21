@@ -41,71 +41,75 @@ media 1,6 nuovi al mese. Non è un problema solo di questo studio."
 **Soluzione (0:30 – 1:00)**
 
 "Probata è il collega che fa il lavoro e chiede prima. Raccoglie le fatture da
-email, API di fatturazione e pannelli dei fornitori. Ogni dato letto porta la
-citazione e la pagina da cui viene. A decidere sono regole deterministiche:
-il modello legge e spiega, il codice decide. Ogni eccezione ferma il giro. Un
-fornitore mai visto lo cerchiamo sulle sue pagine pubbliche e, se un fatto
-non ha una fonte, scriviamo 'non lo so'. Niente parte senza l'approvazione di
-una persona, e tutto finisce nel registro."
+email, API di fatturazione e pannelli dei fornitori. A decidere sono regole
+scritte nel codice: il modello legge, il codice decide. Ogni eccezione ferma
+la chiusura. Un fornitore mai visto lo cerchiamo sulle sue pagine pubbliche
+e, se un fatto non ha una fonte, scriviamo 'non lo so'. Niente parte senza
+l'approvazione di una persona, e tutto finisce nel registro."
 
 **Demo dal vivo (1:00 – 2:30)**: copione cliccato qui sotto.
 
-"Ottobre 2026, dati sintetici di una società inventata. Avvio il giro: 18
-documenti da tre canali, nove eccezioni aperte, ognuna con la prova accanto. Qui
-l'IVA tedesca addebitata: ecco la riga citata. Qui una fattura intestata a una
-persona. Qui un fornitore ricorrente senza fattura. Helix è nuovo: sulla sua
-pagina Probata trova soggetto, paese, partita IVA e che fattura senza IVA alle
-imprese UE. Su Sable la pagina non lo dice: non lo deduce, lo segnala e
-prepara una mail che aspetta la mia approvazione. Il pacchetto non è partito.
-Risolvo un'eccezione, lascio nome e motivo. Approvo: l'invio è simulato. Nel
-registro c'è chi ha approvato e quando."
+"Ottobre 2026, dati sintetici di una società inventata. Avvio la chiusura: 18
+fatture, dieci pronte, otto bloccate, una mancante. Qui l'IVA tedesca
+addebitata, con la riga della fattura come prova e il link al documento
+originale. Sable è un fornitore nuovo e la sua pagina non dice come fattura:
+Probata non lo deduce, prepara una mail e blocca il pacchetto. Risolvo
+l'eccezione, lascio nome e motivo: il pacchetto si sblocca e passa da dieci
+a undici fatture. Scelgo dove mandarlo, commercialista o gestionale, e
+approvo. Per ogni fattura valida c'è una bozza di autofattura: la approvo e
+la trasmetto. Nel registro c'è chi ha deciso cosa, e quando."
 
 **Chiusura (2:30 – 3:00)**
 
-"Quello che abbiamo costruito oggi gira su dati sintetici, con invio e fonti
-simulati, e non genera ancora l'autofattura per lo SdI. Il caso non si regge
-sul tempo risparmiato da un singolo studio, ma sugli errori trovati prima
-della scadenza, su un processo che non dipende più da una persona e su tutte
-le aziende con lo stesso problema. Probata fa il lavoro, e chiede prima."
+"Quello che abbiamo costruito oggi gira su dati sintetici. Le fonti, l'invio
+allo SdI e la consegna al gestionale sono simulati, e le bozze di
+autofattura non sono validate fiscalmente: lo scriviamo anche
+nell'interfaccia. Il caso non si regge sul tempo risparmiato da un singolo
+studio, che abbiamo misurato ed è basso, ma sugli errori trovati prima della
+scadenza e su un processo che non dipende più da una persona. Probata fa il
+lavoro, e chiede prima."
 
 ### Se la giuria prova a rompere la demo
 
-- "Invialo senza approvare": non si può; il pacchetto resta in attesa e
-  l'invio automatico è spento di default.
-- "E se il fornitore non pubblica nulla?": è il caso Sable, risponde "non lo
-  so" e passa la decisione a una persona.
-- "Il modello può sbagliare?": le regole sono codice; ogni valore ha
-  citazione e pagina da controllare.
-- Non dire: tempo risparmiato in euro, penali risparmiate, nessun numero che
-  non sia in `docs/domain.md`. Le regole fiscali sono riportate dal
-  commercialista e non verificate: dirlo se chiesto.
+- "Inviate davvero allo SdI e scrivete nel gestionale?": no. Oggi vanno a
+  servizi finti dentro l'app e la bozza TD17 non è validata; è costruito il
+  percorso con approvazione e registro.
+- "La demo usa l'AI?": la demo rilegge estrazioni salvate per stare nei tre
+  minuti. Con Gemini dal vivo abbiamo fatto una sola prova: 18 PDF, le 9
+  eccezioni attese, 172 secondi. Non è un benchmark.
+- "Invialo senza approvare": non si può. Pacchetto e autofatture non partono
+  mai da soli; l'invio automatico esiste solo per modelli di mail
+  predefiniti, è spento di default e chi lo accende finisce nel registro.
+- "E se il fornitore non risponde mai?": "Invia comunque senza queste
+  fatture", con il nome di chi decide.
+- "Chi approva è autenticato?": no, è un nome digitato. Non c'è login.
+- "Quanto si risparmia?": per uno studio poco, 10–30 ore l'anno misurate.
+  Non abbiamo dati di mercato e non li inventiamo.
+- "E le fatture in dollari?": si fermano e chiedono il controvalore in euro
+  a una persona. Non inventiamo un cambio.
+- Non dire nessun numero che non sia in `docs/domain.md`. Le regole fiscali
+  sono riportate dal commercialista e non verificate: dirlo se chiesto.
 
 ## (c) Click-by-click demo script (about 90 seconds of the three minutes)
 
-Walked through headless on `main` (commit `2308f1d` plus the interface at
-that time) on 21 November, at the end of the data stream's work. Labels are
-those of the Italian interface then; re-check after the 16:15 freeze. Start
-with the app running (`npm run build && npm start`, Chromium installed with
-`npx playwright install chromium`) and a backup video of this same path.
-What the run shows: 18 documenti, **9 eccezioni aperte**, 10 fatture nel
-pacchetto, 2 invii in attesa di approvazione.
+Walked through on the hosted demo on 21 November at 15:57, commit `70485e0`.
+Before going on stage: open the site, press **Ripristina demo**, and on
+**Approvazioni** set the destination back to "Commercialista" (the reset
+keeps the last choice). Scroll a button into view before clicking it.
 
-| Time | Click                                                                                                               | Say / point at                                                                                                                                                                                                                                                                                                                              |
-| ---- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1:00 | **Panoramica**: press **Ripristina demo**                                                                           | "Parto da zero: ottobre 2026, dati sintetici."                                                                                                                                                                                                                                                                                              |
-| 1:05 | Press **Avvia il giro del mese** (about 10 seconds; the browser channel runs for real)                              | Message "Giro completato: 18 fatture, 9 eccezioni, 2 invii da approvare". Email, API, Browser counters fill in.                                                                                                                                                                                                                             |
-| 1:15 | Read **Pronte / Bloccate / Mancanti**                                                                               | "Quello che è pulito passa. Il resto aspetta una persona."                                                                                                                                                                                                                                                                                  |
-| 1:18 | Card **Brief del giro**: press **Ascolta il brief** and let it play (about 15 seconds, 32 words)                    | The spoken status: "Hai raccolto 18 fatture: 10 pronte, 8 bloccate, una mancante. 9 eccezioni aperte: … 2 invii aspettano la tua approvazione." Then: "La voce legge soltanto: le approvazioni restano un clic." **Ascolta il dettaglio** (about a minute) reads every exception: do not play it in the demo; the full text is on the card. |
-| 1:20 | **Eccezioni**: the card **FOREIGN_VAT_CHARGED** (Lumen)                                                             | Under PROVA the quoted line "VAT 19%: EUR 15.20"; under COSA PROPONE PROBATA the proposed action.                                                                                                                                                                                                                                           |
-| 1:30 | Scroll: **ADDRESSED_TO_PERSON** (Cobalt), **MISSING_EXPECTED_INVOICE** (Marlow, with the card charge)               | "Intestata a un socio. Un ricorrente che manca, trovato oggi e non il 15."                                                                                                                                                                                                                                                                  |
-| 1:40 | **Fornitori**: **Helix Metrics Ltd** ("Da verificare", section DATI TROVATI)                                        | Each fact with its quote and source: the invoice for entity and country, the billing page for tax id and VAT rule.                                                                                                                                                                                                                          |
-| 1:50 | **Approvazioni**: the card **RICHIESTA AL FORNITORE** (Sable); under **INVIO AUTOMATICO** the toggle is "Disattivo" | "Sable non dice il trattamento IVA: non lo deduco, preparo una mail. E non parte." Pacchetto also waiting.                                                                                                                                                                                                                                  |
-| 2:05 | **Eccezioni**: on one card fill in "Come l'hai risolta" and "Il tuo nome", press **Segna come risolta**             | "Ogni decisione ha un nome." The exception moves to Risolte.                                                                                                                                                                                                                                                                                |
-| 2:15 | **Approvazioni**: package card, type a name in "Il tuo nome", press **Approva**, then **Invia**                     | The card shows "Approvata da … Inviata … (simulata)". The email lists 14 suppliers, "in verifica" and "DA RICEVERE" notes.                                                                                                                                                                                                                  |
-| 2:25 | **Registro**                                                                                                        | One line per step: who, on which input, who approved and when; research facts with source and quote.                                                                                                                                                                                                                                        |
+| Time | Click                                                                                                                            | Say / point at                                                                                                              |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 1:00 | **Panoramica**: **Ripristina demo**, then **Avvia la chiusura** (about 10 seconds)                                               | "Chiusura completata: 18 fatture, 9 eccezioni, 2 invii da approvare." Tiles: 10 pronte, 8 bloccate, 1 mancante.             |
+| 1:12 | Optional: **Ascolta il riepilogo** (16 seconds)                                                                                  | "La voce legge soltanto: le approvazioni restano un clic." Skip it if the room is noisy.                                    |
+| 1:15 | **Eccezioni**: the card "IVA estera addebitata" (Lumen)                                                                          | The evidence line and **Apri la fattura originale**.                                                                        |
+| 1:25 | **Approvazioni**                                                                                                                 | "Pacchetto in attesa: manca la risposta di Sable Tools LLC." The email to the supplier is waiting for approval.             |
+| 1:35 | **Eccezioni**: on the Sable card ("Dati del fornitore non trovati") fill in the resolution and your name, **Segna come risolta** | "Ogni decisione ha un nome."                                                                                                |
+| 1:50 | **Approvazioni**: choose the destination, type your name, **Approva**, then **Invia** or **Consegna al gestionale (simulato)**   | The package is now approvable. Point at "(simulato)" yourself, before the jury does.                                        |
+| 2:05 | **Adempimenti**: one draft, type your name, **Approva**, **Trasmetti allo SdI (simulato)**                                       | The foreign invoice, then the TD17 draft. "Bozza dimostrativa, 22% da confermare." A non-EUR invoice shows "Da completare". |
+| 2:20 | **Registro**                                                                                                                     | One line per step: who, on which input, who approved and when.                                                              |
 
-Fallback if the live run fails: play the backup video, then show
-**Registro** and the open exceptions from a previous run.
+If the live run fails: show **Registro** and the open exceptions from the
+previous closure, and say what failed.
 
 ## Character count check
 
