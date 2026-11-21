@@ -241,7 +241,7 @@ export function buildActionBrief(db: Db, daysLeft?: number | null): string {
   if (toCorrect.length > 0) {
     parts.push(
       `${toCorrect.length === 1 ? "Una fattura va fatta correggere" : `${toCorrect.length} fatture vanno fatte correggere`} dal fornitore: ` +
-        `${names(toCorrect.map((e) => e.supplierName))}. Chiedi la correzione oppure escludile.`,
+        `${names(toCorrect.map((e) => e.supplierName))}. Chiedi la correzione oppure ${toCorrect.length === 1 ? "escludila" : "escludile"}.`,
     );
   }
 

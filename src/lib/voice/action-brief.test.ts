@@ -37,6 +37,7 @@ describe("buildActionBrief", () => {
     expect(text).toContain("un dato da inserire a mano");
     expect(text).toContain("una fattura di un altro mese da escludere");
     expect(text).toContain("Una fattura va fatta correggere dal fornitore: Lumen");
+    expect(text).toContain("oppure escludila.");
     expect(text.indexOf("Sable")).toBeLessThan(text.indexOf("Puoi chiudere subito"));
   });
 
