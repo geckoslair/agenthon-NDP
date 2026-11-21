@@ -99,6 +99,38 @@ CREATE TABLE IF NOT EXISTS auto_send_policies (
   enabled_at TEXT
 );
 
+-- Self-invoice ("autofattura") drafts for the month's valid foreign invoices, their
+-- simulated submission to SdI and their simulated export to the accounting software.
+-- Nothing is submitted or exported while status is 'draft' or 'needs_input'.
+CREATE TABLE IF NOT EXISTS self_invoices (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  run_id INTEGER NOT NULL REFERENCES runs(id),
+  invoice_id INTEGER NOT NULL REFERENCES invoices(id),
+  -- Document type code as reported by the accountant for services (docs/domain.md).
+  doc_type TEXT NOT NULL DEFAULT 'TD17',
+  number TEXT NOT NULL,
+  -- Taxable amount in EUR; NULL until a person supplies it for non-EUR invoices.
+  taxable_eur REAL,
+  vat_rate REAL NOT NULL,
+  vat_eur REAL,
+  xml_path TEXT,
+  status TEXT NOT NULL DEFAULT 'draft'
+    CHECK (status IN ('needs_input','draft','approved','submitted','rejected')),
+  -- Why a person must act before approval (e.g. missing EUR amount); NULL otherwise.
+  needs_input_reason TEXT,
+  approved_by TEXT,
+  approved_at TEXT,
+  submitted_at TEXT,
+  -- Receipt id returned by the simulated SdI endpoint.
+  sdi_receipt TEXT,
+  accounting_status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (accounting_status IN ('pending','exported')),
+  accounting_ref TEXT,
+  exported_by TEXT,
+  exported_at TEXT,
+  UNIQUE (run_id, invoice_id)
+);
+
 -- Append-only trail: what was done, on which input, who approved it.
 CREATE TABLE IF NOT EXISTS audit_log (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
