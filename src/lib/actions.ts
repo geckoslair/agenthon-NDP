@@ -14,6 +14,7 @@ import {
 } from "./compliance";
 import {
   approvePackage,
+  requestCorrection,
   excludeInvoice,
   completeUnreadableFields,
   deliverPackage,
@@ -343,5 +344,26 @@ export async function excludeInvoiceAction(
     return r.ok
       ? { ok: true, message: "Fattura esclusa dalla chiusura. Il PDF resta disponibile." }
       : { ok: false, message: r.error ?? "Non è stato possibile escludere la fattura." };
+  });
+}
+
+/** Asks the supplier for a corrected document (a draft email that waits for approval). */
+export async function requestCorrectionAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const exceptionId = id(formData, "id");
+  if (!exceptionId) return { ok: false, message: "Eccezione non valida." };
+  return guarded(() => {
+    const r = requestCorrection(getDb(), exceptionId, currentUser().name);
+    if (!r.ok)
+      return { ok: false, message: r.error ?? "Non è stato possibile chiedere la correzione." };
+    return {
+      ok: true,
+      message: r.alreadyRequested
+        ? "La richiesta c'è già: non ne creo un'altra."
+        : "Richiesta creata. Il messaggio al fornitore aspetta la tua approvazione (invio simulato).",
+    };
   });
 }

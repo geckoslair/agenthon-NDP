@@ -1,5 +1,10 @@
 import { ActionForm, SubmitButton } from "@/components/action-form";
-import { exceptionLabel, unreadableEvidence, formatDateTime } from "@/components/format";
+import {
+  correctionLabel,
+  exceptionLabel,
+  unreadableEvidence,
+  formatDateTime,
+} from "@/components/format";
 import { PageHeader } from "@/components/page-header";
 import { StateTag } from "@/components/state-tag";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,9 +13,13 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { UnreadableForm } from "@/components/unreadable-form";
-import { excludeInvoiceAction, resolveExceptionAction } from "@/lib/actions";
+import {
+  excludeInvoiceAction,
+  requestCorrectionAction,
+  resolveExceptionAction,
+} from "@/lib/actions";
 import { getDb } from "@/lib/db";
-import { unreadableFields } from "@/lib/pipeline";
+import { correctionStatus, unreadableFields } from "@/lib/pipeline";
 import { listExceptions, type ExceptionRow } from "@/lib/queries";
 import Link from "next/link";
 
@@ -34,6 +43,56 @@ function Subject({ e }: { e: ExceptionRow }) {
 }
 
 const EXCLUDABLE = ["WRONG_MONTH", "FOREIGN_VAT_CHARGED", "ADDRESSED_TO_PERSON"];
+
+const CORRECTABLE = ["FOREIGN_VAT_CHARGED", "ADDRESSED_TO_PERSON"];
+
+function ExcludeForm({ exceptionId }: { exceptionId: number }) {
+  return (
+    <ActionForm action={excludeInvoiceAction} className="flex flex-col gap-3">
+      <input type="hidden" name="id" value={exceptionId} />
+      <p className="text-sm text-ink-2">
+        {
+          "Escludendo la fattura la togli da questa chiusura: il PDF resta, nulla viene spostato o dichiarato valido."
+        }
+      </p>
+      <div>
+        <SubmitButton variant="outline" pendingLabel="Escludo…">
+          Escludi
+        </SubmitButton>
+      </div>
+    </ActionForm>
+  );
+}
+
+function CorrectionBlock({ exceptionId }: { exceptionId: number }) {
+  const status = correctionStatus(getDb(), exceptionId);
+  const l = correctionLabel(status.state);
+  return (
+    <ActionForm action={requestCorrectionAction} className="flex flex-col gap-3">
+      <input type="hidden" name="id" value={exceptionId} />
+      <p className="text-sm text-ink-2">
+        Puoi chiedere al fornitore un documento corretto (simulato: nessuna email parte davvero),
+        oppure escludere la fattura da questa chiusura.
+      </p>
+      {status.state !== "none" && (
+        <p className="flex flex-wrap items-center gap-3">
+          <StateTag label={l.label} tone={l.tone} />
+          {status.message && <span className="text-sm text-ink-2">{status.message}</span>}
+          {status.outboxId && (
+            <Link href="/approvazioni" className="text-sm underline">
+              Vai alle approvazioni
+            </Link>
+          )}
+        </p>
+      )}
+      <div>
+        <SubmitButton pendingLabel="Creo la richiesta…" disabled={!l.canRequest}>
+          Richiedi correzione
+        </SubmitButton>
+      </div>
+    </ActionForm>
+  );
+}
 
 function ExceptionCard({ e }: { e: ExceptionRow }) {
   const label = exceptionLabel(e.code);
@@ -83,22 +142,15 @@ function ExceptionCard({ e }: { e: ExceptionRow }) {
         </div>
         {open && unreadable ? (
           <UnreadableForm exceptionId={e.id} fields={unreadableFields(getDb(), e.id)} />
+        ) : open && CORRECTABLE.includes(e.code) ? (
+          <div className="flex flex-col gap-5 border-t border-line pt-5">
+            <CorrectionBlock exceptionId={e.id} />
+            <ExcludeForm exceptionId={e.id} />
+          </div>
         ) : open && EXCLUDABLE.includes(e.code) ? (
-          <ActionForm
-            action={excludeInvoiceAction}
-            className="flex flex-col gap-3 border-t border-line pt-5"
-          >
-            <input type="hidden" name="id" value={e.id} />
-            <p className="text-sm text-ink-2">
-              Escludendo la fattura la togli da questa chiusura: il PDF resta, nulla viene spostato
-              o dichiarato valido.
-            </p>
-            <div>
-              <SubmitButton variant="outline" pendingLabel="Escludo…">
-                Escludi
-              </SubmitButton>
-            </div>
-          </ActionForm>
+          <div className="border-t border-line pt-5">
+            <ExcludeForm exceptionId={e.id} />
+          </div>
         ) : open ? (
           <ActionForm
             action={resolveExceptionAction}

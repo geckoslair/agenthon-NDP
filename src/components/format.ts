@@ -302,3 +302,35 @@ export function unreadableEvidence(evidence: string | null | undefined): string 
     .filter(Boolean);
   return fields.length > 0 ? `Non letto: ${fields.map(fieldLabel).join(", ")}` : null;
 }
+
+/** Label for the state of a supplier correction request, and whether a new one may be made. */
+export function correctionLabel(state: string): {
+  label: string;
+  tone: Tone;
+  canRequest: boolean;
+} {
+  switch (state) {
+    case "none":
+      return { label: "Nessuna richiesta", tone: "neutral", canRequest: true };
+    case "awaiting_approval":
+      return { label: "In attesa di approvazione", tone: "warn", canRequest: false };
+    case "approved":
+      return { label: "Approvata, non ancora inviata (simulata)", tone: "warn", canRequest: false };
+    case "sent":
+      return {
+        label: "Inviata (simulata), in attesa del documento corretto",
+        tone: "warn",
+        canRequest: false,
+      };
+    case "rejected":
+      return { label: "Richiesta rifiutata", tone: "bad", canRequest: true };
+    case "document_received":
+      return { label: "Documento corretto ricevuto, in verifica", tone: "warn", canRequest: false };
+    case "validated":
+      return { label: "Documento corretto verificato", tone: "ok", canRequest: false };
+    case "failed":
+      return { label: "Documento corretto non utilizzabile", tone: "bad", canRequest: false };
+    default:
+      return { label: state, tone: "neutral", canRequest: false };
+  }
+}

@@ -7,6 +7,7 @@ import {
   nextClosureLabel,
   fieldLabel,
   manualNote,
+  correctionLabel,
   unreadableEvidence,
   today,
   cleanName,
@@ -137,5 +138,33 @@ describe("unreadableEvidence", () => {
     expect(unreadableEvidence("")).toBeNull();
     expect(unreadableEvidence("altro testo")).toBeNull();
     expect(unreadableEvidence("Campi non letti:  , ")).toBeNull();
+  });
+});
+
+describe("correctionLabel", () => {
+  it("allows a request only when none is outstanding", () => {
+    expect(correctionLabel("none").canRequest).toBe(true);
+    expect(correctionLabel("rejected").canRequest).toBe(true);
+    for (const s of [
+      "awaiting_approval",
+      "approved",
+      "sent",
+      "document_received",
+      "validated",
+      "failed",
+    ]) {
+      expect(correctionLabel(s).canRequest).toBe(false);
+    }
+  });
+  it("names the sent state as simulated and waiting for the document", () => {
+    expect(correctionLabel("sent").label).toBe(
+      "Inviata (simulata), in attesa del documento corretto",
+    );
+    expect(correctionLabel("awaiting_approval").label).toBe("In attesa di approvazione");
+    expect(correctionLabel("weird")).toEqual({
+      label: "weird",
+      tone: "neutral",
+      canRequest: false,
+    });
   });
 });
