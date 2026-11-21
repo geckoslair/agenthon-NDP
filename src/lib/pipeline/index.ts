@@ -678,6 +678,8 @@ export function resetDemo(db: Db, options: { demoDir?: string; month?: string } 
   const monthDir = path.join(demoDir, month);
   db.transaction(() => {
     for (const table of [
+      // corrections references invoices, exceptions and outbox: it must go first.
+      "corrections",
       "self_invoices",
       "exceptions",
       "outbox",
