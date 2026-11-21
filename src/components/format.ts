@@ -250,3 +250,21 @@ export function nextClosureLabel(today: Date): string {
   }
   return `3 ${MONTHS[mo]} ${y}`;
 }
+
+/**
+ * "Today" for the deadline tile. PROBATA_TODAY (YYYY-MM-DD) pins the demo date; an unset or
+ * invalid value falls back to the real date. `demo` is set only when the pinned date is used.
+ */
+export function today(
+  env: string | undefined = process.env.PROBATA_TODAY,
+  now: Date = new Date(),
+): { date: Date; demo: string | null } {
+  const m = env ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(env.trim()) : null;
+  if (m) {
+    const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    if (d.getUTCFullYear() === +m[1] && d.getUTCMonth() === +m[2] - 1 && d.getUTCDate() === +m[3]) {
+      return { date: d, demo: env!.trim() };
+    }
+  }
+  return { date: now, demo: null };
+}

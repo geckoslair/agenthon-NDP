@@ -3,6 +3,7 @@ import {
   daysToDeadline,
   formatAmount,
   nextClosureLabel,
+  today,
   formatMonth,
   invoiceStatus,
   outboxStatus,
@@ -70,7 +71,8 @@ export default async function Home({
   const o = getOverview(db, month);
   const invoices = o.run ? listInvoices(db, o.run.id) : [];
   const c = getComplianceCounts(db, o.run?.id);
-  const days = o.run ? daysToDeadline(o.month, new Date()) : null;
+  const now = today();
+  const days = o.run ? daysToDeadline(o.month, now.date) : null;
   const pkg = o.package ? outboxStatus(o.package.status) : null;
 
   return (
@@ -121,7 +123,7 @@ export default async function Home({
           </nav>
         )}
         <p className="text-sm text-ink-2">
-          Prossima chiusura pianificata: {nextClosureLabel(new Date())}. Nel prototipo la
+          Prossima chiusura pianificata: {nextClosureLabel(now.date)}. Nel prototipo la
           pianificazione non è attiva: l&apos;avvio è manuale.
         </p>
       </div>
@@ -156,9 +158,9 @@ export default async function Home({
           hint={
             days === null
               ? "nessuna chiusura"
-              : days >= 0
-                ? "giorni al 15 del mese dopo"
-                : "giorni di ritardo sul 15"
+              : `${days >= 0 ? "giorni al 15 del mese dopo" : "giorni di ritardo sul 15"}${
+                  now.demo ? ` · Data dimostrativa: ${now.demo}` : ""
+                }`
           }
         />
         <Tile label="Pacchetto" href="/approvazioni">

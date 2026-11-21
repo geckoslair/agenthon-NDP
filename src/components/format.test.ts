@@ -5,6 +5,7 @@ import {
   deadlineFor,
   daysToDeadline,
   nextClosureLabel,
+  today,
   cleanName,
   exceptionLabel,
   formatAmount,
@@ -84,5 +85,22 @@ describe("deadline helpers", () => {
     expect(nextClosureLabel(new Date("2026-11-01T10:00:00Z"))).toBe("3 novembre 2026");
     expect(nextClosureLabel(new Date("2026-11-03T10:00:00Z"))).toBe("3 dicembre 2026");
     expect(nextClosureLabel(new Date("2026-12-20T10:00:00Z"))).toBe("3 gennaio 2027");
+  });
+});
+
+describe("today", () => {
+  const now = new Date("2026-11-21T10:00:00Z");
+  it("uses the pinned date when PROBATA_TODAY is valid", () => {
+    const t = today("2026-11-04", now);
+    expect(t.demo).toBe("2026-11-04");
+    expect(t.date.toISOString().slice(0, 10)).toBe("2026-11-04");
+    expect(daysToDeadline("2026-10", t.date)).toBe(11);
+  });
+  it("falls back to the real date when unset, empty or invalid", () => {
+    for (const bad of [undefined, "", "tomorrow", "2026-13-01", "2026-02-30", "04/11/2026"]) {
+      const t = today(bad, now);
+      expect(t.demo).toBeNull();
+      expect(t.date).toBe(now);
+    }
   });
 });
