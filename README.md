@@ -11,6 +11,11 @@ charges, researches suppliers it has never seen, **stops at every exception
 and sends nothing without a person's approval**. Every step is written to an
 append-only audit log: what, on which input, who approved.
 
+> **Prototype.** Everything runs on synthetic data. The three invoice
+> sources (mailbox, supplier billing API, supplier dashboard) and every
+> outgoing email are simulated: no real mailbox, supplier, accountant or tax
+> authority is contacted.
+
 Live demo: https://web-production-32589d1c.up.railway.app
 
 ## Who it is for
