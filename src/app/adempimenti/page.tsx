@@ -22,15 +22,6 @@ function pct(rate: number): string {
   return `${Math.round(rate <= 1 ? rate * 100 : rate)}%`;
 }
 
-function NameField({ id }: { id: string }) {
-  return (
-    <div className="flex flex-col gap-2 sm:max-w-xs">
-      <Label htmlFor={id}>Il tuo nome</Label>
-      <Input id={id} name="person" required maxLength={80} />
-    </div>
-  );
-}
-
 function SelfInvoiceCard({ r }: { r: SelfInvoiceRow }) {
   const s = selfInvoiceStatus(r.status);
   return (
@@ -111,7 +102,6 @@ function SelfInvoiceCard({ r }: { r: SelfInvoiceRow }) {
                 <Label htmlFor={`amt-${r.id}`}>Imponibile in euro</Label>
                 <Input id={`amt-${r.id}`} name="amount" inputMode="decimal" required />
               </div>
-              <NameField id={`who-amt-${r.id}`} />
               <div>
                 <SubmitButton pendingLabel="Salvo…">Salva l&apos;importo</SubmitButton>
               </div>
@@ -124,7 +114,6 @@ function SelfInvoiceCard({ r }: { r: SelfInvoiceRow }) {
               className="flex flex-col gap-4 border-t border-line pt-4"
             >
               <input type="hidden" name="id" value={r.id} />
-              <NameField id={`who-dec-${r.id}`} />
               <div className="flex flex-wrap gap-3">
                 <SubmitButton name="decision" value="approved" pendingLabel="Salvo…">
                   Approva
@@ -232,7 +221,6 @@ export default function CompliancePage() {
           contattato.
         </p>
         <ActionForm action={exportAccountingAction} className="flex flex-col gap-4">
-          <NameField id="who-export" />
           <div>
             <SubmitButton pendingLabel="Esporto…">Esporta in contabilità (simulato)</SubmitButton>
             <span className="ml-3 text-sm text-ink-2">{toExport.length} da esportare</span>

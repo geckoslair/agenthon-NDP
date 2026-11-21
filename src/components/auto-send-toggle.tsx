@@ -1,7 +1,6 @@
 "use client";
-// Switch for one predefined template. Flipping it submits the form with the person's name.
+// Switch for one predefined template. Flipping it submits the form; the author is the session user, set on the server.
 import { useActionState, useRef } from "react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { setAutoSendAction } from "@/lib/actions";
@@ -12,7 +11,6 @@ export function AutoSendToggle({ template, enabled }: { template: string; enable
   const formRef = useRef<HTMLFormElement>(null);
   const enabledRef = useRef<HTMLInputElement>(null);
   const switchId = `auto-${template}`;
-  const nameId = `who-${template}`;
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-3">
       <input type="hidden" name="template" value={template} />
@@ -31,12 +29,6 @@ export function AutoSendToggle({ template, enabled }: { template: string; enable
         <Label htmlFor={switchId} className="text-sm">
           {enabled ? "Attivo" : "Disattivo"}
         </Label>
-        <div className="flex items-center gap-2">
-          <Label htmlFor={nameId} className="text-sm text-ink-2">
-            Il tuo nome
-          </Label>
-          <Input id={nameId} name="person" required maxLength={80} className="h-9 w-44" />
-        </div>
       </div>
       {state && (
         <p role="status" className={cn("text-sm font-semibold", state.ok ? "text-ok" : "text-bad")}>

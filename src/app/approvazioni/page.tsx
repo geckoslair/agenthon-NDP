@@ -47,10 +47,6 @@ function OutboxCard({ m, mode }: { m: OutboxRow; mode: "accountant" | "erp" }) {
             className="flex flex-col gap-4 border-t border-line pt-5"
           >
             <input type="hidden" name="id" value={m.id} />
-            <div className="flex flex-col gap-2 sm:max-w-xs">
-              <Label htmlFor={`who-${m.id}`}>Il tuo nome</Label>
-              <Input id={`who-${m.id}`} name="person" required maxLength={80} />
-            </div>
             <div className="flex flex-wrap gap-3">
               <SubmitButton name="decision" value="approved" pendingLabel="Salvo…">
                 Approva
@@ -137,10 +133,6 @@ export default function ApprovalsPage() {
           . La scelta è tua; nulla parte senza la tua approvazione.
         </p>
         <ActionForm action={setDeliveryModeAction} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2 sm:max-w-xs">
-            <Label htmlFor="who-mode">Il tuo nome</Label>
-            <Input id="who-mode" name="person" required maxLength={80} />
-          </div>
           <div className="flex flex-wrap gap-3">
             <SubmitButton
               name="mode"
@@ -178,10 +170,6 @@ export default function ApprovalsPage() {
           </p>
           <ActionForm action={approvePackageForceAction} className="mt-4 flex flex-col gap-4">
             <input type="hidden" name="id" value={outboxId} />
-            <div className="flex flex-col gap-2 sm:max-w-xs">
-              <Label htmlFor={`who-force-${outboxId}`}>Il tuo nome</Label>
-              <Input id={`who-force-${outboxId}`} name="person" required maxLength={80} />
-            </div>
             <div>
               <SubmitButton variant="outline" pendingLabel="Salvo…">
                 Invia comunque senza queste fatture

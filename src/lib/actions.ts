@@ -2,9 +2,9 @@
 // Server actions: the only way the UI changes state. Each one calls a function from
 // pipeline/ or audit.ts, never writes tables itself, then revalidates the pages.
 import { revalidatePath } from "next/cache";
-import { cleanName } from "@/components/format";
 import { decideOutgoing, markSent, setAutoSend } from "./audit";
 import { getDb } from "./db";
+import { currentUser } from "./session";
 import { DEFAULT_MONTH, getLatestRun, getOutbox } from "./queries";
 import {
   decideSelfInvoice,
@@ -98,10 +98,9 @@ export async function resolveExceptionAction(
   void _prev;
   const exceptionId = id(formData, "id");
   const resolution = text(formData, "resolution");
-  const person = cleanName(formData.get("person"));
+  const person = currentUser().name;
   if (!exceptionId) return { ok: false, message: "Eccezione non valida." };
   if (!resolution) return { ok: false, message: "Scrivi come hai risolto l'eccezione." };
-  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
   return guarded(() =>
     resolveException(getDb(), exceptionId, resolution, person)
       ? { ok: true, message: "Eccezione risolta." }
@@ -116,12 +115,11 @@ export async function decideOutgoingAction(
   void _prev;
   const outboxId = id(formData, "id");
   const decision = text(formData, "decision");
-  const person = cleanName(formData.get("person"));
+  const person = currentUser().name;
   if (!outboxId) return { ok: false, message: "Invio non valido." };
   if (decision !== "approved" && decision !== "rejected") {
     return { ok: false, message: "Decisione non valida." };
   }
-  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
   return guarded(() => {
     const db = getDb();
     if (decision === "approved" && getOutbox(db, outboxId)?.kind === "package") {
@@ -143,9 +141,8 @@ export async function approvePackageForceAction(
 ): Promise<ActionResult> {
   void _prev;
   const outboxId = id(formData, "id");
-  const person = cleanName(formData.get("person"));
+  const person = currentUser().name;
   if (!outboxId) return { ok: false, message: "Invio non valido." };
-  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
   return guarded(() => {
     const r = approvePackage(getDb(), outboxId, person, { force: true });
     return r.ok
@@ -160,9 +157,8 @@ export async function setDeliveryModeAction(
 ): Promise<ActionResult> {
   void _prev;
   const mode = text(formData, "mode");
-  const person = cleanName(formData.get("person"));
+  const person = currentUser().name;
   if (mode !== "accountant" && mode !== "erp") return { ok: false, message: "Scelta non valida." };
-  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
   return guarded(() => {
     setDeliveryMode(getDb(), mode, person);
     return {
@@ -208,9 +204,8 @@ export async function setAutoSendAction(
   void _prev;
   const template = text(formData, "template");
   const enabled = text(formData, "enabled") === "true";
-  const person = cleanName(formData.get("person"));
+  const person = currentUser().name;
   if (!template) return { ok: false, message: "Modello non valido." };
-  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
   return guarded(() => {
     setAutoSend(getDb(), template, enabled, person);
     return {
@@ -232,12 +227,11 @@ export async function setEuroAmountAction(
   const selfId = id(formData, "id");
   const raw = text(formData, "amount").replace(",", ".");
   const amount = Number(raw);
-  const person = cleanName(formData.get("person"));
+  const person = currentUser().name;
   if (!selfId) return { ok: false, message: "Autofattura non valida." };
   if (!raw || !Number.isFinite(amount) || amount <= 0) {
     return { ok: false, message: "Scrivi un importo in euro maggiore di zero." };
   }
-  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
   return guarded(() =>
     setEuroAmount(getDb(), selfId, amount, person)
       ? { ok: true, message: "Importo salvato. La bozza è pronta per la tua revisione." }
@@ -252,12 +246,11 @@ export async function decideSelfInvoiceAction(
   void _prev;
   const selfId = id(formData, "id");
   const decision = text(formData, "decision");
-  const person = cleanName(formData.get("person"));
+  const person = currentUser().name;
   if (!selfId) return { ok: false, message: "Autofattura non valida." };
   if (decision !== "approved" && decision !== "rejected") {
     return { ok: false, message: "Decisione non valida." };
   }
-  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
   return guarded(() =>
     decideSelfInvoice(getDb(), selfId, decision, person)
       ? {
@@ -291,8 +284,7 @@ export async function exportAccountingAction(
   formData: FormData,
 ): Promise<ActionResult> {
   void _prev;
-  const person = cleanName(formData.get("person"));
-  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
+  const person = currentUser().name;
   return guarded(async () => {
     const db = getDb();
     const run = getLatestRun(db);
@@ -314,9 +306,8 @@ export async function completeUnreadableFieldsAction(
 ): Promise<ActionResult> {
   void _prev;
   const exceptionId = id(formData, "id");
-  const person = cleanName(formData.get("person"));
+  const person = currentUser().name;
   if (!exceptionId) return { ok: false, message: "Eccezione non valida." };
-  if (!person) return { ok: false, message: "Scrivi il tuo nome." };
   const values: Record<string, string> = {};
   for (const [key, value] of formData.entries()) {
     if (key.startsWith("field:") && typeof value === "string") values[key.slice(6)] = value.trim();

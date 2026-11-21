@@ -85,10 +85,6 @@ function ExceptionCard({ e }: { e: ExceptionRow }) {
               <Label htmlFor={`res-${e.id}`}>Come l'hai risolta</Label>
               <Textarea id={`res-${e.id}`} name="resolution" required rows={2} />
             </div>
-            <div className="flex flex-col gap-2 sm:max-w-xs">
-              <Label htmlFor={`who-${e.id}`}>Il tuo nome</Label>
-              <Input id={`who-${e.id}`} name="person" required maxLength={80} />
-            </div>
             <div>
               <SubmitButton pendingLabel="Salvo…">Segna come risolta</SubmitButton>
             </div>

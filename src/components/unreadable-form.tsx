@@ -46,10 +46,6 @@ export function UnreadableForm({ exceptionId, fields }: { exceptionId: number; f
           </div>
         );
       })}
-      <div className="flex flex-col gap-2 sm:max-w-xs">
-        <Label htmlFor={`who-${exceptionId}`}>Il tuo nome</Label>
-        <Input id={`who-${exceptionId}`} name="person" required maxLength={80} />
-      </div>
       <div>
         <SubmitButton pendingLabel="Verifico…">Salva e verifica</SubmitButton>
       </div>

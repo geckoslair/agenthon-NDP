@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { Nav } from "@/components/nav";
+import { currentUser } from "@/lib/session";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,7 +23,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             >
               <Logo height={32} className="text-foreground" />
             </Link>
-            <Nav />
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+              <Nav />
+              <span className="text-sm text-ink-2">{currentUser().name} · accesso simulato</span>
+            </div>
           </div>
         </header>
         <main className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-10 sm:px-6 sm:py-16">
