@@ -6,7 +6,6 @@ import {
   today,
   formatMonth,
   invoiceStatus,
-  outboxStatus,
   runStatus,
 } from "@/components/format";
 import { StateTag } from "@/components/state-tag";
@@ -48,7 +47,7 @@ function Tile({
     </>
   );
   const cls =
-    "flex min-h-28 flex-col justify-between gap-2 rounded-[14px] border border-line bg-card p-4";
+    "flex min-h-28 min-w-[9.5rem] flex-1 basis-[10rem] flex-col justify-between gap-2 rounded-[14px] border border-line bg-card p-4";
   return href ? (
     <Link href={href} className={`${cls} hover:border-foreground hover:text-foreground`}>
       {inner}
@@ -73,7 +72,6 @@ export default async function Home({
   const c = getComplianceCounts(db, o.run?.id);
   const now = today();
   const days = o.run ? daysToDeadline(o.month, now.date) : null;
-  const pkg = o.package ? outboxStatus(o.package.status) : null;
 
   return (
     <>
@@ -84,6 +82,9 @@ export default async function Home({
           <p className="mt-2 text-ink-2">
             Probata controlla ogni dato e si ferma a ogni dubbio. Non invia nulla senza la tua
             approvazione.
+          </p>
+          <p className="mt-2 text-sm text-ink-2">
+            Prossima chiusura prevista: {nextClosureLabel(now.date)}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
             {o.run && <StateTag {...runStatus(o.run.status)} />}
@@ -122,10 +123,6 @@ export default async function Home({
             ))}
           </nav>
         )}
-        <p className="text-sm text-ink-2">
-          Prossima chiusura pianificata: {nextClosureLabel(now.date)}. Nel prototipo la
-          pianificazione non è attiva: l&apos;avvio è manuale.
-        </p>
       </div>
 
       {o.warnings.length > 0 && (
@@ -142,7 +139,7 @@ export default async function Home({
         </section>
       )}
 
-      <section aria-label="Riepilogo" className="grid grid-cols-2 gap-5 lg:grid-cols-6">
+      <section aria-label="Riepilogo" className="flex flex-wrap gap-5">
         <Tile label="Fatture pronte" value={o.ready} hint="controllate" />
         <Tile label="Bloccate" value={o.blocked} hint="aspettano te" href="/eccezioni" />
         <Tile label="Mancanti" value={o.missing} hint="attese, non arrivate" href="/eccezioni" />
@@ -163,18 +160,11 @@ export default async function Home({
                 }`
           }
         />
-        <Tile label="Pacchetto" href="/approvazioni">
-          <StateTag
-            label={pkg ? pkg.label : o.run ? "Non ancora pronto" : "Non creato"}
-            tone={pkg ? pkg.tone : "neutral"}
-          />
-        </Tile>
       </section>
 
       <section className="mt-16 border-t border-line pt-10" aria-labelledby="inv">
-        <p className="eyebrow mb-3">Fatture della chiusura</p>
         <h2 id="inv" className="mb-6">
-          Una per una
+          Fatture della chiusura
         </h2>
         {invoices.length === 0 ? (
           <p className="text-ink-2">Nessuna fattura ancora. Avvia la chiusura.</p>
