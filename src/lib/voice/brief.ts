@@ -171,3 +171,94 @@ export function buildShortBrief(db: Db): string {
 
   return [totals, exceptions, approval].join(" ");
 }
+
+function names(list: (string | null)[]): string {
+  const unique = [...new Set(list.filter((n): n is string => !!n))];
+  return joinItalian(unique.slice(0, 2)) + (unique.length > 2 ? " e altri" : "");
+}
+
+/**
+ * The spoken summary of what to do next, most urgent first. It does not repeat the
+ * dashboard counts: it says how much time is left, what blocks the package, what the
+ * person can close alone and what depends on a supplier. Built only from the data.
+ * `daysLeft` is the number of days to the deadline, when the caller knows it.
+ */
+export function buildActionBrief(db: Db, daysLeft?: number | null): string {
+  const run = getLatestRun(db);
+  if (!run) return "Nessuna chiusura avviata. Avviala per sapere cosa c'è da fare.";
+  const open = listExceptions(db, "open").filter((e) => e.runId === run.id);
+  const of = (code: string) => open.filter((e) => e.code === code);
+  const parts: string[] = [];
+
+  if (typeof daysLeft === "number") {
+    parts.push(
+      daysLeft > 1
+        ? `Mancano ${daysLeft} giorni alla scadenza.`
+        : daysLeft === 1
+          ? "Manca un giorno alla scadenza."
+          : daysLeft === 0
+            ? "La scadenza è oggi."
+            : "La scadenza è passata.",
+    );
+  }
+
+  const unknown = of("SUPPLIER_FACTS_UNKNOWN");
+  if (unknown.length > 0) {
+    parts.push(
+      `La cosa più urgente: il pacchetto è fermo perché manca la risposta di ${names(unknown.map((e) => e.supplierName))}. ` +
+        "La mail è pronta e aspetta la tua approvazione.",
+    );
+  }
+
+  const quick: string[] = [];
+  const unreadable = of("UNREADABLE_FIELD").length;
+  const wrongMonth = of("WRONG_MONTH").length;
+  const duplicate = of("DUPLICATE").length;
+  const notForeign = of("NOT_FOREIGN").length;
+  if (unreadable > 0)
+    quick.push(countPhrase(unreadable, "un dato da inserire a mano", "dati da inserire a mano"));
+  if (wrongMonth > 0)
+    quick.push(
+      countPhrase(
+        wrongMonth,
+        "una fattura di un altro mese da escludere",
+        "fatture di un altro mese da escludere",
+      ),
+    );
+  if (duplicate > 0)
+    quick.push(countPhrase(duplicate, "un doppione da confermare", "doppioni da confermare"));
+  if (notForeign > 0)
+    quick.push(
+      countPhrase(
+        notForeign,
+        "un fornitore italiano da togliere",
+        "fornitori italiani da togliere",
+      ),
+    );
+  if (quick.length > 0) parts.push(`Puoi chiudere subito, da solo: ${joinItalian(quick)}.`);
+
+  const toCorrect = [...of("FOREIGN_VAT_CHARGED"), ...of("ADDRESSED_TO_PERSON")];
+  if (toCorrect.length > 0) {
+    parts.push(
+      `${toCorrect.length === 1 ? "Una fattura va fatta correggere" : `${toCorrect.length} fatture vanno fatte correggere`} dal fornitore: ` +
+        `${names(toCorrect.map((e) => e.supplierName))}. Chiedi la correzione oppure escludile.`,
+    );
+  }
+
+  const unsure = of("OUT_OF_KNOWN_RULES");
+  if (unsure.length > 0) {
+    parts.push(
+      `${unsure.length === 1 ? "Un caso non lo so valutare" : `${unsure.length} casi non li so valutare`}: ${names(unsure.map((e) => e.supplierName))}. Decidi tu.`,
+    );
+  }
+
+  if (open.length === 0) {
+    const o = getOverview(db);
+    parts.push(
+      o.pendingApprovals > 0
+        ? "Nessuna eccezione aperta. Il pacchetto è pronto e aspetta la tua approvazione."
+        : "Nessuna azione urgente.",
+    );
+  }
+  return parts.join(" ");
+}

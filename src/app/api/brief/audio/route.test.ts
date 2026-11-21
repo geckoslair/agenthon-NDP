@@ -30,7 +30,7 @@ describe("GET /api/brief/audio", () => {
       path.join(
         tmp,
         "voice",
-        `${cacheKey("Nessun giro eseguito.", DEFAULT_MODEL, DEFAULT_VOICE)}.mp3`,
+        `${cacheKey("Nessuna chiusura avviata. Avviala per sapere cosa c'è da fare.", DEFAULT_MODEL, DEFAULT_VOICE)}.mp3`,
       ),
       Buffer.from([1, 2, 3]),
     );
