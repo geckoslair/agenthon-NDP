@@ -3,9 +3,10 @@
 Team Cicconi's project for AGENTHON (GDG Torino, 21 November 2026), Track 1
 "Agentic AI for business", Challenge B · Back Office Autopilot.
 
-A back-office autopilot for the passive foreign invoicing of Italian SMEs:
-it runs the process end to end, stops at exceptions, asks a person before
-anything that cannot be undone, and logs every step.
+A back-office autopilot for Italian software houses that buy from foreign
+suppliers: at the quoting stage it checks whether a supplier is compliant
+with Italian tax rules and what it really costs, stops at exceptions, asks a
+person before anything that cannot be undone, and logs every step.
 
 > Work in progress. Description, technologies and start instructions are
 > completed before the 17:00 submission.

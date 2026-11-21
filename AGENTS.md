@@ -25,8 +25,10 @@ commit at 17:00; anything pushed later does not count.
 
 ## Product direction (in progress)
 
-Passive foreign invoicing for Italian SMEs that buy from foreign suppliers.
-The exact process is still being chosen, see `docs/decisions.md`. Do not
+Italian software houses that buy from foreign suppliers. The MVP is decision
+support in the quoting flow: is this supplier compliant with Italian tax
+rules, and what does it really cost. Details are still open, see
+`docs/decisions.md`. Do not
 invent scope: if something is not decided there, ask the humans.
 
 ## What wins (from the brief)

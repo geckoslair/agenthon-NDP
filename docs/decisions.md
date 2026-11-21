@@ -8,7 +8,9 @@ it is not decided; ask the humans.
 | Topic | Decision |
 | --- | --- |
 | Challenge | B · Back Office Autopilot |
-| Domain | Passive foreign invoicing for Italian SMEs buying from foreign suppliers |
+| Domain | Italian software houses buying from foreign suppliers (passive foreign invoicing) |
+| MVP process | Decision support in the quoting flow: is this foreign supplier compliant with Italian tax rules, and what does it really cost |
+| Long-term vision (not today) | Automated invoice collection, analysis, split across cost centres, self-invoice and tax obligations |
 | Stack | TypeScript, Node 20, one full-stack app, Prettier, Vitest |
 | Git | Commit straight to `main`, no PRs, quick and dirty |
 | Credits | Each member uses their own Google and ElevenLabs credits and keys, in a local `.env` |
@@ -16,11 +18,12 @@ it is not decided; ask the humans.
 
 ## Open
 
-- **Which process.** Two candidates:
-  1. Selecting suppliers that are compliant with Italian tax rules at the
-     quote stage.
-  2. Collecting foreign invoices automatically, then handling the
-     self-invoice ("autofattura") and the related tax obligations.
+- **How decision support becomes an end-to-end process.** Challenge B asks
+  for "raw input in, finished output out", a stop at exceptions, and an
+  approval before anything is sent, paid or exported. The MVP needs a raw
+  input, a finished output and an irreversible step. Not settled yet.
+- Which quote: the one received from the supplier, or the one the software
+  house writes for its client.
 - Framework and persistence for the app.
 - Where ElevenLabs fits in the product.
 - Project name (finalists pitch in reverse alphabetical order).
