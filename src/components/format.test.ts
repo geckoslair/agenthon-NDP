@@ -7,6 +7,7 @@ import {
   nextClosureLabel,
   fieldLabel,
   manualNote,
+  unreadableEvidence,
   today,
   cleanName,
   exceptionLabel,
@@ -121,5 +122,20 @@ describe("manual field helpers", () => {
       "inserito a mano da Maria il 21/11/2026 15:05",
     );
     expect(manualNote(undefined, undefined)).toBe("inserito a mano da una persona");
+  });
+});
+
+describe("unreadableEvidence", () => {
+  it("translates the raw field names to Italian labels", () => {
+    expect(unreadableEvidence("Campi non letti: invoiceNumber")).toBe("Non letto: Numero fattura");
+    expect(unreadableEvidence("Campi non letti: invoiceNumber, currency")).toBe(
+      "Non letto: Numero fattura, Valuta",
+    );
+  });
+  it("returns null when the text is not in that form", () => {
+    expect(unreadableEvidence(null)).toBeNull();
+    expect(unreadableEvidence("")).toBeNull();
+    expect(unreadableEvidence("altro testo")).toBeNull();
+    expect(unreadableEvidence("Campi non letti:  , ")).toBeNull();
   });
 });

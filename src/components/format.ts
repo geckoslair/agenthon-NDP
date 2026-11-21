@@ -288,3 +288,17 @@ export function fieldLabel(field: string): string {
 export function manualNote(by: string | undefined, at: string | undefined): string {
   return `inserito a mano da ${by ?? "una persona"}${at ? ` il ${formatDateTime(at)}` : ""}`;
 }
+
+/**
+ * Evidence of an UNREADABLE_FIELD exception ("Campi non letti: invoiceNumber, currency") in
+ * Italian labels ("Non letto: Numero fattura, Valuta"); null when it cannot be read that way.
+ */
+export function unreadableEvidence(evidence: string | null | undefined): string | null {
+  const m = /^Campi non letti:\s*(.+)$/.exec(evidence?.trim() ?? "");
+  if (!m) return null;
+  const fields = m[1]
+    .split(",")
+    .map((f) => f.trim())
+    .filter(Boolean);
+  return fields.length > 0 ? `Non letto: ${fields.map(fieldLabel).join(", ")}` : null;
+}

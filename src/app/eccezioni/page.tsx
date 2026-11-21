@@ -1,5 +1,5 @@
 import { ActionForm, SubmitButton } from "@/components/action-form";
-import { exceptionLabel, formatDateTime } from "@/components/format";
+import { exceptionLabel, unreadableEvidence, formatDateTime } from "@/components/format";
 import { PageHeader } from "@/components/page-header";
 import { StateTag } from "@/components/state-tag";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +37,8 @@ function ExceptionCard({ e }: { e: ExceptionRow }) {
   const label = exceptionLabel(e.code);
   const open = e.status === "open";
   const unreadable = e.code === "UNREADABLE_FIELD";
+  // For unreadable fields the raw technical text is shown with Italian labels (or not at all).
+  const evidence = unreadable ? unreadableEvidence(e.evidence) : e.evidence;
   return (
     <Card>
       <CardHeader>
@@ -51,8 +53,12 @@ function ExceptionCard({ e }: { e: ExceptionRow }) {
         <p>{unreadable && open ? label.explanation : e.message || label.explanation}</p>
         <div className="rounded-[12px] bg-background p-4">
           <p className="eyebrow mb-2">Prova</p>
-          {e.evidence ? (
-            <blockquote className="font-serif text-lg leading-snug">“{e.evidence}”</blockquote>
+          {evidence ? (
+            unreadable ? (
+              <p className="text-lg">{evidence}</p>
+            ) : (
+              <blockquote className="font-serif text-lg leading-snug">“{evidence}”</blockquote>
+            )
           ) : (
             <p className="text-ink-2">Nessuna prova registrata: non lo sappiamo.</p>
           )}
