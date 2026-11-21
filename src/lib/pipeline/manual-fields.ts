@@ -114,7 +114,7 @@ function parseField(
   }
 }
 
-function runCompany(db: Db, runId: number, month: string): CompanyProfile {
+export function runCompany(db: Db, runId: number, month: string): CompanyProfile {
   const stored = db
     .prepare("SELECT value FROM settings WHERE key = ?")
     .get(`run_company:${runId}`) as { value: string } | undefined;

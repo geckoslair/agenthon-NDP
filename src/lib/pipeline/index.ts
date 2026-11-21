@@ -724,3 +724,4 @@ export {
   requestCorrection,
   type CorrectionState,
 } from "./workflow";
+export { attachCorrectedDocument } from "./corrections";
