@@ -27,6 +27,11 @@ commit at 17:00; anything pushed later does not count.
 
 ## Product
 
+The product is called **Probata**. Brand and UI rules are in `docs/design.md`
+(use shadcn components from `src/components/ui`). Ownership of files and the
+interfaces between work streams are in `docs/contracts.md`: read it before
+editing anything.
+
 An autopilot that prepares the monthly package of foreign purchase invoices
 for the accountant: it extracts and validates each invoice, reconciles them
 with card charges, researches suppliers it has never seen, stops at

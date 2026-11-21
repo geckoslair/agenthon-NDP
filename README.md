@@ -1,4 +1,4 @@
-# agenthon-NDP
+# Probata
 
 Team Cicconi's project for AGENTHON (GDG Torino, 21 November 2026), Track 1
 "Agentic AI for business", Challenge B · Back Office Autopilot.
