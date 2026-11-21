@@ -9,7 +9,8 @@ it is not decided; ask the humans.
 | --- | --- |
 | Challenge | B · Back Office Autopilot |
 | Domain | Italian software houses buying from foreign suppliers (passive foreign invoicing) |
-| MVP process | Decision support in the quoting flow: is this foreign supplier compliant with Italian tax rules, and what does it really cost |
+| MVP process | A supplier qualification agent. When a software house prepares a quote for a client and needs external suppliers to cover some features, the agent researches a candidate supplier from external sources and says whether it fits the company's fiscal needs |
+| Role of the real case | The studio described in `docs/domain.md` is evidence of the problem, not the data source of the product. The agent must work for suppliers nobody has used before |
 | Long-term vision (not today) | Automated invoice collection, analysis, split across cost centres, self-invoice and tax obligations |
 | Stack | TypeScript, Node 20, one full-stack app, Prettier, Vitest |
 | Git | Commit straight to `main`, no PRs, quick and dirty |
@@ -18,12 +19,11 @@ it is not decided; ask the humans.
 
 ## Open
 
-- **How decision support becomes an end-to-end process.** Challenge B asks
-  for "raw input in, finished output out", a stop at exceptions, and an
-  approval before anything is sent, paid or exported. The MVP needs a raw
-  input, a finished output and an irreversible step. Not settled yet.
-- Which quote: the one received from the supplier, or the one the software
-  house writes for its client.
+- **How the agent satisfies Challenge B.** It needs a finished output (not
+  only a verdict), a stop at exceptions, and an approval before something
+  irreversible. Not settled yet.
+- Which facts the agent must establish about a supplier, and from which
+  sources. Every fact must carry its source; no source means "unknown".
 - Framework and persistence for the app.
 - Where ElevenLabs fits in the product.
 - Project name (finalists pitch in reverse alphabetical order).

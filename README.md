@@ -3,10 +3,11 @@
 Team Cicconi's project for AGENTHON (GDG Torino, 21 November 2026), Track 1
 "Agentic AI for business", Challenge B · Back Office Autopilot.
 
-A back-office autopilot for Italian software houses that buy from foreign
-suppliers: at the quoting stage it checks whether a supplier is compliant
-with Italian tax rules and what it really costs, stops at exceptions, asks a
-person before anything that cannot be undone, and logs every step.
+A supplier qualification agent for Italian software houses. Before a
+foreign supplier ends up in a client quote, the agent researches it, checks
+whether it fits the company's fiscal needs, cites the source of every
+finding, stops when it does not know, and asks a person before anything
+that cannot be undone. Every step is logged.
 
 > Work in progress. Description, technologies and start instructions are
 > completed before the 17:00 submission.

@@ -26,11 +26,12 @@ commit at 17:00; anything pushed later does not count.
 
 ## Product direction (in progress)
 
-Italian software houses that buy from foreign suppliers. The MVP is decision
-support in the quoting flow: is this supplier compliant with Italian tax
-rules, and what does it really cost. Details are still open, see
-`docs/decisions.md`. Do not
-invent scope: if something is not decided there, ask the humans.
+Italian software houses that buy from foreign suppliers. When a software
+house prepares a quote for a client and needs external suppliers to cover
+some features, a **supplier qualification agent** researches a candidate
+from external sources and says whether it fits the company's fiscal needs
+(invoice addressed to the company, reverse charge, valid tax identifier).
+Details are still open, see `docs/decisions.md`.
 
 ## What wins (from the brief)
 
