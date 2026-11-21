@@ -43,5 +43,6 @@ rules, and each rule must cite its source here.
 
 ## Pre-existing components
 
-None so far. Anything reused from before the event must be listed here and
+None. The Probata brand, design system and logo were also made today
+(confirmed by the team at 15:20). Anything reused from before the event must be listed here and
 in the submission description.
