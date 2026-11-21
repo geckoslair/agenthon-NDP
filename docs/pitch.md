@@ -54,7 +54,7 @@ fatture, dieci pronte, otto bloccate, una mancante. Qui l'IVA tedesca
 addebitata, con la riga della fattura come prova e il link al documento
 originale. Sable è un fornitore nuovo e la sua pagina non dice come fattura:
 Probata non lo deduce, prepara una mail e blocca il pacchetto. Risolvo
-l'eccezione, lascio nome e motivo: il pacchetto si sblocca e passa da dieci
+l'eccezione e scrivo il motivo: il pacchetto si sblocca e passa da dieci
 a undici fatture. Scelgo dove mandarlo, commercialista o gestionale, e
 approvo. Per ogni fattura valida c'è una bozza di autofattura: la approvo e
 la trasmetto. Nel registro c'è chi ha deciso cosa, e quando."
@@ -81,8 +81,9 @@ lavoro, e chiede prima."
   mai da soli; l'invio automatico esiste solo per modelli di mail
   predefiniti, è spento di default e chi lo accende finisce nel registro.
 - "E se il fornitore non risponde mai?": "Invia comunque senza queste
-  fatture", con il nome di chi decide.
-- "Chi approva è autenticato?": no, è un nome digitato. Non c'è login.
+  fatture"; chi lo fa resta nel registro.
+- "Chi approva è autenticato?": no. L'utente in alto è dimostrativo e
+  l'intestazione lo dice ("accesso simulato"): nel prototipo non c'è login.
 - "Quanto si risparmia?": per uno studio poco, 10–30 ore l'anno misurate.
   Non abbiamo dati di mercato e non li inventiamo.
 - "E le fatture in dollari?": si fermano e chiedono il controvalore in euro
@@ -92,21 +93,22 @@ lavoro, e chiede prima."
 
 ## (c) Click-by-click demo script (about 90 seconds of the three minutes)
 
-Walked through on the hosted demo on 21 November at 15:57, commit `70485e0`.
+Walked through on the hosted demo on 21 November at 16:18, commit `77eb354`.
 Before going on stage: open the site, press **Ripristina demo**, and on
 **Approvazioni** set the destination back to "Commercialista" (the reset
 keeps the last choice). Scroll a button into view before clicking it.
 
-| Time | Click                                                                                                                            | Say / point at                                                                                                              |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| 1:00 | **Panoramica**: **Ripristina demo**, then **Avvia la chiusura** (about 10 seconds)                                               | "Chiusura completata: 18 fatture, 9 eccezioni, 2 invii da approvare." Tiles: 10 pronte, 8 bloccate, 1 mancante.             |
-| 1:12 | Optional: **Ascolta il riepilogo** (16 seconds)                                                                                  | "La voce legge soltanto: le approvazioni restano un clic." Skip it if the room is noisy.                                    |
-| 1:15 | **Eccezioni**: the card "IVA estera addebitata" (Lumen)                                                                          | The evidence line and **Apri la fattura originale**.                                                                        |
-| 1:25 | **Approvazioni**                                                                                                                 | "Pacchetto in attesa: manca la risposta di Sable Tools LLC." The email to the supplier is waiting for approval.             |
-| 1:35 | **Eccezioni**: on the Sable card ("Dati del fornitore non trovati") fill in the resolution and your name, **Segna come risolta** | "Ogni decisione ha un nome."                                                                                                |
-| 1:50 | **Approvazioni**: choose the destination, type your name, **Approva**, then **Invia** or **Consegna al gestionale (simulato)**   | The package is now approvable. Point at "(simulato)" yourself, before the jury does.                                        |
-| 2:05 | **Adempimenti**: one draft, type your name, **Approva**, **Trasmetti allo SdI (simulato)**                                       | The foreign invoice, then the TD17 draft. "Bozza dimostrativa, 22% da confermare." A non-EUR invoice shows "Da completare". |
-| 2:20 | **Registro**                                                                                                                     | One line per step: who, on which input, who approved and when.                                                              |
+| Time | Click                                                                                                                         | Say / point at                                                                                                                   |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1:00 | **Panoramica**: **Ripristina demo**, then **Avvia la chiusura** (about 10 seconds)                                            | "Chiusura completata: 18 fatture, 9 eccezioni, 2 invii da approvare." Tiles: 10 pronte, 8 bloccate, 1 mancante.                  |
+| 1:12 | Optional: **Ascolta il riepilogo** (16 seconds)                                                                               | "La voce legge soltanto: le approvazioni restano un clic." Skip it if the room is noisy.                                         |
+| 1:15 | **Eccezioni**: the card "IVA estera addebitata" (Lumen)                                                                       | The evidence line and **Apri la fattura originale**.                                                                             |
+| 1:25 | **Approvazioni**                                                                                                              | "Pacchetto in attesa: manca la risposta di Sable Tools LLC." The email to the supplier is waiting for approval.                  |
+| 1:28 | **Eccezioni**: the card "Campo illeggibile" (Tandoor): type the invoice number read on the original PDF, **Salva e verifica** | "Manca un numero: lo inserisco io, Probata lo ricontrolla e segna che è stato scritto a mano." An empty value does not close it. |
+| 1:35 | **Eccezioni**: on the Sable card ("Dati del fornitore non trovati") write how it was resolved, **Segna come risolta**         | "Ogni decisione ha un autore." The author is the demo user shown in the header ("accesso simulato").                             |
+| 1:50 | **Approvazioni**: choose the destination, **Approva**, then **Invia** or **Consegna al gestionale (simulato)**                | The package is now approvable. Point at "(simulato)" yourself, before the jury does.                                             |
+| 2:05 | **Adempimenti**: one draft, **Approva**, **Trasmetti allo SdI (simulato)**                                                    | The foreign invoice, then the TD17 draft. "Bozza dimostrativa, 22% da confermare." A non-EUR invoice shows "Da completare".      |
+| 2:20 | **Registro**                                                                                                                  | One line per step: who, on which input, who approved and when.                                                                   |
 
 If the live run fails: show **Registro** and the open exceptions from the
 previous closure, and say what failed.

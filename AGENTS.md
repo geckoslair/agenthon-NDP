@@ -53,6 +53,7 @@ exceptions and sends nothing without a person's approval. The spec is
 | `src/lib/extractor.ts`, `src/lib/gemini.ts`   | Fixture extractor (default) and live Gemini (`EXTRACTOR=gemini`)                      |
 | `src/lib/compliance/`, `src/app/adempimenti/` | Self-invoice drafts (TD17), simulated SdI submission and accounting export            |
 | `src/lib/voice/`, `src/app/api/brief/`        | Spoken brief with ElevenLabs, cached on disk                                          |
+| `src/lib/session.ts`                          | The simulated signed-in demo user (no real login)                                     |
 | `src/lib/queries.ts`, `src/lib/actions.ts`    | Reads and server actions used by the pages                                            |
 | `src/app/`                                    | Pages: overview, `eccezioni`, `approvazioni`, `fornitori`, `registro`, `fatture/[id]` |
 | `src/app/mock/`                               | Fake supplier billing API, dashboard and billing-info pages                           |

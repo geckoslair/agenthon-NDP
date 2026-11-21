@@ -165,6 +165,9 @@ repository is public):
   "export to accounting" posts entries to a fake accounting endpoint
   (`/mock/accounting/entries`). No tax authority and no accounting product
   is contacted.
+- **The signed-in user.** There is no login. The author of every decision
+  is a made-up demo user set on the server (`PROBATA_DEMO_USER`, default
+  "Giulia Ferraris"); the header says "accesso simulato".
 - **Data.** All companies, people and tax ids are invented; none belongs to a
   real person or business.
 
