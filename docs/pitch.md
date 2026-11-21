@@ -50,7 +50,7 @@ l'approvazione di una persona, e tutto finisce nel registro."
 **Demo dal vivo (1:00 – 2:30)**: copione cliccato qui sotto.
 
 "Ottobre 2026, dati sintetici di una società inventata. Avvio la chiusura: 18
-fatture, dieci pronte, otto bloccate, una mancante. Qui l'IVA tedesca
+fatture, dieci pronte, otto bloccate. Qui l'IVA tedesca
 addebitata, con la riga della fattura come prova e il link al documento
 originale. Sable è un fornitore nuovo e la sua pagina non dice come fattura:
 Probata non lo deduce, prepara una mail e blocca il pacchetto. Risolvo
@@ -75,8 +75,8 @@ lavoro, e chiede prima."
   servizi finti dentro l'app e la bozza TD17 non è validata; è costruito il
   percorso con approvazione e registro.
 - "La demo usa l'AI?": la demo rilegge estrazioni salvate per stare nei tre
-  minuti. Con Gemini dal vivo abbiamo fatto una sola prova: 18 PDF, le 9
-  eccezioni attese, 172 secondi. Non è un benchmark.
+  minuti. Con Gemini dal vivo abbiamo fatto una sola prova: 18 PDF, tutte le
+  eccezioni allora attese, 172 secondi. Non è un benchmark.
 - "Invialo senza approvare": non si può. Pacchetto e autofatture non partono
   mai da soli; l'invio automatico esiste solo per modelli di mail
   predefiniti, è spento di default e chi lo accende finisce nel registro.
@@ -100,7 +100,7 @@ keeps the last choice). Scroll a button into view before clicking it.
 
 | Time | Click                                                                                                                         | Say / point at                                                                                                                   |
 | ---- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| 1:00 | **Panoramica**: **Ripristina demo**, then **Avvia la chiusura** (about 10 seconds)                                            | "Chiusura completata: 18 fatture, 9 eccezioni, 2 invii da approvare." Tiles: 10 pronte, 8 bloccate, 1 mancante.                  |
+| 1:00 | **Panoramica**: **Ripristina demo**, then **Avvia la chiusura** (about 10 seconds)                                            | "Chiusura completata: 18 fatture, 8 eccezioni, 2 invii da approvare." Tiles: 10 pronte, 8 bloccate.                              |
 | 1:12 | Optional: **Ascolta il riepilogo** (16 seconds)                                                                               | "La voce legge soltanto: le approvazioni restano un clic." Skip it if the room is noisy.                                         |
 | 1:15 | **Eccezioni**: the card "IVA estera addebitata" (Lumen)                                                                       | The evidence line and **Apri la fattura originale**.                                                                             |
 | 1:25 | **Approvazioni**                                                                                                              | "Pacchetto in attesa: manca la risposta di Sable Tools LLC." The email to the supplier is waiting for approval.                  |

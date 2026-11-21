@@ -61,6 +61,14 @@ it is not decided; ask the humans.
 - **Not done:** a recorded video of the browser collection; a second month
   of demo data.
 
+## Decided (21 November 2026, 16:30), last round
+
+- **Missing expected invoice retired** as an exception (scope reduction).
+- **"Escludi"** for wrong month, foreign VAT and addressed to a person.
+- **"Richiedi correzione"** for foreign VAT and addressed to a person, with
+  a corrected document that must pass the rules before anything resolves.
+- Details in `docs/spec.md`, section "Changes at 16:30".
+
 ## Open
 
 - Where ElevenLabs fits in the product.

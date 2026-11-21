@@ -53,7 +53,7 @@ the project is described in [`docs/domain.md`](docs/domain.md).
    email is a draft until a person approves it.
 
 The language model extracts and explains; the rules decide. Exceptions
-handled: missing expected invoice, addressed to a person, foreign VAT
+handled: addressed to a person, foreign VAT
 charged, wrong month, not a foreign supplier, duplicate, supplier facts
 unknown, unreadable field, and cases outside the known rules ("I don't
 know, a person decides"). See [`docs/spec.md`](docs/spec.md).
@@ -66,8 +66,9 @@ then decide; the model never does.
 
 Measured on 21 November 2026 on the demo month: with live Gemini extraction
 (`EXTRACTOR=gemini`) the run over the 18 PDFs raised **exactly the 9
-exceptions listed in `demo/2026-10/expected.json`**, in 172 seconds
-(sequential calls). One run, one dataset: it is a check, not a benchmark.
+exceptions then listed in `demo/2026-10/expected.json`**, in 172 seconds
+(sequential calls). One of those nine, the missing expected invoice, came from
+the completeness rule and has since been retired, so the file lists 8 today. One run, one dataset: it is a check, not a benchmark.
 
 Because that is too slow to click through in a three-minute pitch, the
 hosted demo and the tests replay the stored extraction in
@@ -123,7 +124,7 @@ repeating the same brief costs nothing.
 ## Run the demo month
 
 The repository contains a synthetic month, October 2026, for the fictional
-"Acme Studio SRL": 18 invoice PDFs from 13 invented suppliers (plus a 14th, recurring, whose invoice is missing) in five
+"Acme Studio SRL": 18 invoice PDFs from 13 invented suppliers (plus a 14th, recurring, with no invoice this month) in five
 different layouts, card charges, a supplier registry, a fixture mailbox and
 the list of exceptions the run must raise
 ([`demo/2026-10/README.md`](demo/2026-10/README.md)).
@@ -175,6 +176,12 @@ repository is public):
 
 Not built:
 
+- The "missing expected invoice" exception. It was built and then retired at
+  16:30 at the team's request: the run still reconciles invoices with card
+  charges and logs the result, but no longer raises an exception for it.
+- A corrected document from a supplier can be attached to an invoice, but
+  the demo extractor reads only PDFs that have ground truth in the
+  repository; any other upload is refused with an explicit message.
 - A real, validated self-invoice (FatturaPA XML) and a real submission to
   SdI; a real accounting integration. See the simulation above.
 - Real mailbox, bank or supplier connections.

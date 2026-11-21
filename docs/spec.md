@@ -72,16 +72,16 @@ Implemented in `src/lib/audit.ts` (`queueOutgoing`, `setAutoSend`).
 
 All taken from real episodes in `docs/domain.md`.
 
-| Exception                | Rule                                                                              |
-| ------------------------ | --------------------------------------------------------------------------------- |
-| Expected invoice missing | Recurring supplier in the registry, or a card charge, with no invoice this month  |
-| Addressed to a person    | Addressee or VAT number is not the company's                                      |
-| Foreign VAT charged      | VAT amount greater than zero on a foreign invoice                                 |
-| Wrong month              | Invoice date outside the month of the run                                         |
-| Not foreign              | Supplier country is Italy                                                         |
-| Duplicate                | Same supplier, number and amount, or receipt plus invoice for one charge          |
-| Supplier facts unknown   | Research did not establish the required facts                                     |
-| Out of known rules       | For example a private individual outside the EU: "I don't know, a person decides" |
+| Exception                                   | Rule                                                                                                |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Expected invoice missing (retired at 16:30) | No longer raised. Reconciliation with recurring suppliers and card charges still runs and is logged |
+| Addressed to a person                       | Addressee or VAT number is not the company's                                                        |
+| Foreign VAT charged                         | VAT amount greater than zero on a foreign invoice                                                   |
+| Wrong month                                 | Invoice date outside the month of the run                                                           |
+| Not foreign                                 | Supplier country is Italy                                                                           |
+| Duplicate                                   | Same supplier, number and amount, or receipt plus invoice for one charge                            |
+| Supplier facts unknown                      | Research did not establish the required facts                                                       |
+| Out of known rules                          | For example a private individual outside the EU: "I don't know, a person decides"                   |
 
 Each exception shows the evidence, a proposed action, and waits for a
 person. Resolving it is logged with who decided.
@@ -119,6 +119,27 @@ this invoice blocked?" from the log.
 Next.js (TypeScript) with SQLite, run locally for the demo. Gemini on
 Vertex AI (`gemini-3.8-flash`) for extraction and research. A backup video
 of the demo recorded before 17:00.
+
+## Changes at 16:30 **[built]**
+
+Requested by the team after reviewing the interface; this supersedes the
+exception table above where they differ.
+
+- **Missing expected invoice is retired.** The run no longer raises it.
+  Rows already in a database are kept for history but are not listed, not
+  counted and never block a package. This is a deliberate scope reduction.
+- **Exclude.** For wrong month, foreign VAT charged and addressed to a
+  person, a person can exclude the invoice from the closure's package. The
+  PDF and an audit record stay; the date is not changed, the invoice is not
+  marked valid and is not moved to another month. All open exceptions on
+  that invoice close with it.
+- **Ask for a correction.** For foreign VAT charged and addressed to a
+  person, a person can queue an email to the supplier (approval required,
+  sending simulated). The exception stays open until a corrected document is
+  attached, extracted and passes the rules again. A note or an approved
+  email is never proof of correction.
+- **Complete unreadable fields.** A person types the missing values; they
+  are validated, saved as manual corrections and the rules run again.
 
 ## Self-invoicing, SdI and accounting **[built as a simulation]**
 
