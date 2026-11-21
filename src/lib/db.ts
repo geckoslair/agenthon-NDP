@@ -131,6 +131,14 @@ CREATE TABLE IF NOT EXISTS self_invoices (
   UNIQUE (run_id, invoice_id)
 );
 
+-- Small key/value store for choices a person makes (e.g. delivery_mode).
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_by TEXT,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Append-only trail: what was done, on which input, who approved it.
 CREATE TABLE IF NOT EXISTS audit_log (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
