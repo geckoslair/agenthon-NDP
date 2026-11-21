@@ -1,39 +1,159 @@
+import { ActionForm, SubmitButton } from "@/components/action-form";
+import {
+  channelLabel,
+  formatDateTime,
+  formatMonth,
+  invoiceStatus,
+  outboxStatus,
+  runStatus,
+} from "@/components/format";
+import { PageHeader } from "@/components/page-header";
+import { StateTag } from "@/components/state-tag";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { resetDemoAction, runMonthAction } from "@/lib/actions";
 import { getDb } from "@/lib/db";
+import { getOverview, listInvoices } from "@/lib/queries";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-function count(sql: string): number {
-  return (getDb().prepare(sql).get() as { n: number }).n;
+const CHANNELS = ["email", "api", "browser"];
+
+function Row({ label, hint, value }: { label: string; hint?: string; value: number }) {
+  return (
+    <li className="flex items-baseline justify-between gap-4 rounded-[12px] bg-background px-4 py-3">
+      <span>
+        <span className="font-semibold">{label}</span>
+        {hint && <span className="ml-2 text-ink-2">{hint}</span>}
+      </span>
+      <span className="font-serif text-2xl">{value}</span>
+    </li>
+  );
 }
 
 export default function Home() {
-  const tiles = [
-    { label: "Invoices in runs", value: count("SELECT COUNT(*) AS n FROM invoices") },
-    {
-      label: "Open exceptions",
-      value: count("SELECT COUNT(*) AS n FROM exceptions WHERE status = 'open'"),
-    },
-    {
-      label: "Waiting for approval",
-      value: count("SELECT COUNT(*) AS n FROM outbox WHERE status = 'pending'"),
-    },
-    { label: "Suppliers on file", value: count("SELECT COUNT(*) AS n FROM suppliers") },
-    { label: "Audit log entries", value: count("SELECT COUNT(*) AS n FROM audit_log") },
-  ];
+  const db = getDb();
+  const o = getOverview(db);
+  const invoices = o.run ? listInvoices(db, o.run.id) : [];
+  const counts = new Map(o.channels.map((c) => [c.channel, c.count]));
+  const extra = o.channels.filter((c) => !CHANNELS.includes(c.channel));
+  const pkg = o.package ? outboxStatus(o.package.status) : null;
+
   return (
-    <main className="mx-auto max-w-4xl p-8">
-      <h1 className="text-2xl font-semibold">Foreign invoices autopilot</h1>
-      <p className="mt-2 text-sm opacity-70">
-        Scaffold. The monthly run, the exception queue, approvals and the audit log go here.
-      </p>
-      <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {tiles.map((tile) => (
-          <li key={tile.label} className="rounded-lg border p-4">
-            <div className="text-3xl font-semibold">{tile.value}</div>
-            <div className="mt-1 text-sm opacity-70">{tile.label}</div>
-          </li>
-        ))}
-      </ul>
-    </main>
+    <>
+      <PageHeader
+        eyebrow={formatMonth(o.month)}
+        title="Il giro del mese"
+        lead="Probata raccoglie le fatture estere, controlla ogni dato e si ferma a ogni dubbio. Non invia nulla senza la tua approvazione."
+      />
+
+      <div className="grid gap-5 lg:grid-cols-[3fr_2fr]">
+        <Card>
+          <CardHeader>
+            <p className="eyebrow">Fatture raccolte</p>
+            <CardTitle>
+              {o.run ? `${o.collected} fatture nel giro` : "Nessun giro ancora"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-5">
+            {!o.run && (
+              <p className="text-ink-2">
+                Avvia il giro del mese per raccogliere le fatture da email, API e browser.
+              </p>
+            )}
+            <ul className="flex flex-col gap-2">
+              {CHANNELS.map((c) => (
+                <Row key={c} label={channelLabel(c)} value={counts.get(c) ?? 0} />
+              ))}
+              {extra.map((c) => (
+                <Row key={c.channel} label={channelLabel(c.channel)} value={c.count} />
+              ))}
+            </ul>
+            <p className="eyebrow">Esito</p>
+            <ul className="flex flex-col gap-2">
+              <Row label="Pronte" hint="controllate, nessun dubbio" value={o.ready} />
+              <Row label="Bloccate" hint="aspettano una tua decisione" value={o.blocked} />
+              <Row label="Mancanti" hint="attese ma non arrivate" value={o.missing} />
+            </ul>
+            <div className="flex flex-wrap gap-2">
+              {o.run && <StateTag {...runStatus(o.run.status)} />}
+              {o.openExceptions > 0 && (
+                <StateTag label={`${o.openExceptions} eccezioni aperte`} tone="bad" />
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-col gap-5">
+          <Card className="border-foreground shadow-[var(--shadow)]">
+            <CardHeader>
+              <p className="eyebrow">Pacchetto per il commercialista</p>
+              <CardTitle>
+                {pkg ? pkg.label : o.run ? "Non ancora pronto" : "Non ancora creato"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              {pkg && <StateTag {...pkg} />}
+              <p className="text-ink-2">
+                {o.package?.sentAt
+                  ? `Inviato il ${formatDateTime(o.package.sentAt)} (invio simulato).`
+                  : "Il pacchetto non parte mai da solo: serve la tua approvazione."}
+              </p>
+              <p>
+                <Link href="/approvazioni" className="font-semibold underline">
+                  Vai alle approvazioni →
+                </Link>{" "}
+                {o.pendingApprovals > 0 && (
+                  <span className="text-ink-2">({o.pendingApprovals} in attesa)</span>
+                )}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="flex flex-col gap-4">
+              <ActionForm action={runMonthAction}>
+                <SubmitButton pendingLabel="Giro in corso…">Avvia il giro del mese</SubmitButton>
+              </ActionForm>
+              <ActionForm action={resetDemoAction}>
+                <SubmitButton variant="outline" pendingLabel="Ripristino…">
+                  Ripristina demo
+                </SubmitButton>
+              </ActionForm>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {invoices.length > 0 && (
+        <section className="mt-16 border-t border-line pt-10" aria-labelledby="inv">
+          <p className="eyebrow mb-3">Fatture del giro</p>
+          <h2 id="inv" className="mb-6">
+            Una per una
+          </h2>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {invoices.map((i) => {
+              const s = invoiceStatus(i.status);
+              return (
+                <li
+                  key={i.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-[14px] border border-line px-4 py-3"
+                >
+                  <span>
+                    <Link href={`/fatture/${i.id}`} className="font-semibold underline">
+                      {i.supplierName ?? "Fornitore sconosciuto"}
+                    </Link>
+                    <span className="block text-sm text-ink-2">
+                      {i.fileName} · {channelLabel(i.channel)}
+                    </span>
+                  </span>
+                  <StateTag {...s} />
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+    </>
   );
 }
