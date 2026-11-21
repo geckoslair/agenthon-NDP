@@ -26,3 +26,5 @@ next-env.d.ts
 # local runtime data
 data/*.db
 data/*.db-*
+data/collected/
+data/packages/

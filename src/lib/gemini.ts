@@ -16,7 +16,7 @@ export function getGemini(): GoogleGenAI {
   client ??= new GoogleGenAI({
     vertexai: true,
     project,
-    location: process.env.GOOGLE_CLOUD_LOCATION ?? "us-central1",
+    location: process.env.GOOGLE_CLOUD_LOCATION ?? "global",
   });
   return client;
 }

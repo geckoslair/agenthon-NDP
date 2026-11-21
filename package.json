@@ -10,7 +10,8 @@
     "test": "vitest run",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "extract": "tsx --env-file=.env scripts/extract-invoice.ts"
+    "extract": "tsx --env-file=.env scripts/extract-invoice.ts",
+    "run-month": "tsx scripts/run-month.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

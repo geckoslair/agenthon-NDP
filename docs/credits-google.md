@@ -29,6 +29,17 @@ development.
    Space the calls and retry after a pause on 429.
 6. Avoid the Turin and Doha regions (`europe-west12`, `me-central1`).
 
+## Verified in this project (21 November, 15:00)
+
+- `gemini-3.8-flash` answers only with location **`global`**. In
+  `us-central1` and `europe-west1` it returns NOT_FOUND. So
+  `GOOGLE_CLOUD_LOCATION=global` for text. Veo still needs `us-central1`
+  (portal guidance, not tested here).
+- A new service account needs a few minutes after the `roles/aiplatform.user`
+  grant before calls stop failing with PERMISSION_DENIED.
+- Real extraction of an invoice PDF with `responseJsonSchema` works
+  (`npm run extract -- file.pdf 2026-10`).
+
 ## Models and prices
 
 | Use   | Model id                                                    | Price                                                                    | 30 USD buys                          |

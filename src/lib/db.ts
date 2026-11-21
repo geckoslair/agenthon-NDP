@@ -40,6 +40,9 @@ CREATE TABLE IF NOT EXISTS invoices (
   run_id INTEGER NOT NULL REFERENCES runs(id),
   file_name TEXT NOT NULL,
   supplier_id TEXT REFERENCES suppliers(id),
+  -- Collection channel ('email' | 'billing_api' | 'browser') and where it came from.
+  source TEXT,
+  origin TEXT,
   -- JSON of ExtractedInvoice: every value with its quote and page.
   extracted TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'ok' CHECK (status IN ('ok','exception','excluded'))
