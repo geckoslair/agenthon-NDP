@@ -1,0 +1,57 @@
+{
+  "supplierName": {
+    "value": "Lumen Translate GmbH",
+    "quote": "Lumen Translate GmbH",
+    "page": 1
+  },
+  "supplierCountry": {
+    "value": "DE",
+    "quote": "80331 Munich, Germany",
+    "page": 1
+  },
+  "supplierTaxId": {
+    "value": "DE999000222",
+    "quote": "USt-IdNr.: DE999000222",
+    "page": 1
+  },
+  "invoiceNumber": {
+    "value": "LT-20266",
+    "quote": "Invoice no.: LT-20266",
+    "page": 1
+  },
+  "invoiceDate": {
+    "value": "2026-10-14",
+    "quote": "Invoice date: 14 October 2026",
+    "page": 1
+  },
+  "documentType": {
+    "value": "invoice",
+    "quote": "INVOICE",
+    "page": 1
+  },
+  "totalAmount": {
+    "value": 95.2,
+    "quote": "Total due: EUR 95.20",
+    "page": 1
+  },
+  "vatAmount": {
+    "value": 15.2,
+    "quote": "VAT 19%: EUR 15.20",
+    "page": 1
+  },
+  "currency": {
+    "value": "EUR",
+    "quote": "Total due: EUR 95.20",
+    "page": 1
+  },
+  "addresseeName": {
+    "value": "Acme Studio SRL",
+    "quote": "Acme Studio SRL",
+    "page": 1
+  },
+  "addresseeVatId": {
+    "value": "IT01234567890",
+    "quote": "VAT: IT01234567890",
+    "page": 1
+  }
+}

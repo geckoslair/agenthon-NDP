@@ -1,0 +1,57 @@
+{
+  "supplierName": {
+    "value": "Nimbus Cloud Hosting GmbH",
+    "quote": "Nimbus Cloud Hosting GmbH",
+    "page": 1
+  },
+  "supplierCountry": {
+    "value": "DE",
+    "quote": "10999 Berlin, Germany",
+    "page": 1
+  },
+  "supplierTaxId": {
+    "value": "DE999000111",
+    "quote": "VAT ID: DE999000111",
+    "page": 1
+  },
+  "invoiceNumber": {
+    "value": "INV-1001",
+    "quote": "Invoice no.: INV-1001",
+    "page": 1
+  },
+  "invoiceDate": {
+    "value": "2026-10-02",
+    "quote": "Invoice date: 2 October 2026",
+    "page": 1
+  },
+  "documentType": {
+    "value": "invoice",
+    "quote": "INVOICE",
+    "page": 1
+  },
+  "totalAmount": {
+    "value": 109,
+    "quote": "Total due: EUR 109.00",
+    "page": 1
+  },
+  "vatAmount": {
+    "value": 0,
+    "quote": "VAT 0% (reverse charge): EUR 0.00",
+    "page": 1
+  },
+  "currency": {
+    "value": "EUR",
+    "quote": "Total due: EUR 109.00",
+    "page": 1
+  },
+  "addresseeName": {
+    "value": "Acme Studio SRL",
+    "quote": "Acme Studio SRL",
+    "page": 1
+  },
+  "addresseeVatId": {
+    "value": "IT01234567890",
+    "quote": "VAT: IT01234567890",
+    "page": 1
+  }
+}

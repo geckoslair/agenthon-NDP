@@ -1,0 +1,98 @@
+[
+  {
+    "id": "nimbus",
+    "name": "Nimbus Cloud Hosting GmbH",
+    "country": "DE",
+    "taxId": "DE999000111",
+    "expectedPerMonth": 1,
+    "status": "approved"
+  },
+  {
+    "id": "orbit",
+    "name": "Orbit Analytics Ltd",
+    "country": "IE",
+    "taxId": "IE9999991A",
+    "expectedPerMonth": 1,
+    "status": "approved"
+  },
+  {
+    "id": "glyph",
+    "name": "Glyph Design Software B.V.",
+    "country": "NL",
+    "taxId": "NL999999991B01",
+    "expectedPerMonth": 1,
+    "status": "approved"
+  },
+  {
+    "id": "vesper",
+    "name": "Vesper Compute OÜ",
+    "country": "EE",
+    "taxId": "EE999999991",
+    "expectedPerMonth": 5,
+    "status": "approved"
+  },
+  {
+    "id": "quill",
+    "name": "Quill Docs Inc.",
+    "country": "US",
+    "taxId": "99-9999991",
+    "expectedPerMonth": 1,
+    "status": "approved"
+  },
+  {
+    "id": "alpenrose",
+    "name": "Alpenrose Security AG",
+    "country": "CH",
+    "taxId": "CHE-999.999.991 MWST",
+    "expectedPerMonth": 0,
+    "status": "approved"
+  },
+  {
+    "id": "tandoor",
+    "name": "Tandoor Labs Pvt Ltd",
+    "country": "IN",
+    "taxId": "29AAAAA9999A1Z5",
+    "expectedPerMonth": 1,
+    "status": "approved"
+  },
+  {
+    "id": "cobalt",
+    "name": "Cobalt CI Inc.",
+    "country": "US",
+    "taxId": "99-9999992",
+    "expectedPerMonth": 1,
+    "status": "approved"
+  },
+  {
+    "id": "lumen",
+    "name": "Lumen Translate GmbH",
+    "country": "DE",
+    "taxId": "DE999000222",
+    "expectedPerMonth": 0,
+    "status": "approved"
+  },
+  {
+    "id": "rivolta",
+    "name": "Rivolta Cloud Servizi S.r.l.",
+    "country": "IT",
+    "taxId": "IT99999999990",
+    "expectedPerMonth": 0,
+    "status": "approved"
+  },
+  {
+    "id": "elowen",
+    "name": "Elowen Thistledown",
+    "country": "GB",
+    "taxId": null,
+    "expectedPerMonth": 0,
+    "status": "approved"
+  },
+  {
+    "id": "marlow",
+    "name": "Marlow Fonts Ltd",
+    "country": "GB",
+    "taxId": "GB999999991",
+    "expectedPerMonth": 1,
+    "status": "approved"
+  }
+]

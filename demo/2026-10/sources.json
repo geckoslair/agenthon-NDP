@@ -1,0 +1,34 @@
+{
+  "email": [
+    "nimbus-INV-1001.pdf",
+    "nimbus-INV-1001-copy.pdf",
+    "vesper-VC-26-1041.pdf",
+    "vesper-VC-26-1042.pdf",
+    "vesper-VC-26-1043.pdf",
+    "vesper-VC-26-1044.pdf",
+    "vesper-VC-26-1037.pdf",
+    "alpenrose-AR-2026-0317.pdf",
+    "tandoor-receipt-2026-10-09.pdf",
+    "lumen-LT-20266.pdf",
+    "rivolta-FT-118.pdf",
+    "helix-HX-90017.pdf",
+    "sable-ST-3302.pdf",
+    "elowen-EL-007.pdf"
+  ],
+  "billing_api": {
+    "orbit": [
+      "orbit-2026-10.pdf"
+    ],
+    "quill": [
+      "quill-QD-784512.pdf"
+    ]
+  },
+  "browser": {
+    "glyph": [
+      "glyph-R-88.pdf"
+    ],
+    "cobalt": [
+      "cobalt-CCI-55021.pdf"
+    ]
+  }
+}

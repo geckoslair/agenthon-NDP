@@ -1,0 +1,57 @@
+{
+  "supplierName": {
+    "value": "Vesper Compute OÜ",
+    "quote": "Vesper Compute OÜ",
+    "page": 1
+  },
+  "supplierCountry": {
+    "value": "EE",
+    "quote": "10111 Tallinn, Estonia",
+    "page": 1
+  },
+  "supplierTaxId": {
+    "value": "EE999999991",
+    "quote": "VAT ID: EE999999991",
+    "page": 2
+  },
+  "invoiceNumber": {
+    "value": "VC-26-1043",
+    "quote": "Invoice no.: VC-26-1043",
+    "page": 1
+  },
+  "invoiceDate": {
+    "value": "2026-10-20",
+    "quote": "Invoice date: 2026-10-20",
+    "page": 1
+  },
+  "documentType": {
+    "value": "invoice",
+    "quote": "Usage statement and invoice",
+    "page": 1
+  },
+  "totalAmount": {
+    "value": 52.1,
+    "quote": "Total due: EUR 52.10",
+    "page": 2
+  },
+  "vatAmount": {
+    "value": 0,
+    "quote": "VAT 0% (reverse charge): EUR 0.00",
+    "page": 2
+  },
+  "currency": {
+    "value": "EUR",
+    "quote": "Total due: EUR 52.10",
+    "page": 2
+  },
+  "addresseeName": {
+    "value": "Acme Studio SRL",
+    "quote": "Acme Studio SRL",
+    "page": 1
+  },
+  "addresseeVatId": {
+    "value": "IT01234567890",
+    "quote": "VAT: IT01234567890",
+    "page": 1
+  }
+}

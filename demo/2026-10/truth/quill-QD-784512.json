@@ -1,0 +1,57 @@
+{
+  "supplierName": {
+    "value": "Quill Docs Inc.",
+    "quote": "Quill Docs Inc.",
+    "page": 1
+  },
+  "supplierCountry": {
+    "value": "US",
+    "quote": "Austin, TX 78701, United States",
+    "page": 1
+  },
+  "supplierTaxId": {
+    "value": "99-9999991",
+    "quote": "EIN: 99-9999991",
+    "page": 1
+  },
+  "invoiceNumber": {
+    "value": "QD-784512",
+    "quote": "Invoice no.: QD-784512",
+    "page": 1
+  },
+  "invoiceDate": {
+    "value": "2026-10-03",
+    "quote": "Invoice date: Oct 3, 2026",
+    "page": 1
+  },
+  "documentType": {
+    "value": "invoice",
+    "quote": "INVOICE",
+    "page": 1
+  },
+  "totalAmount": {
+    "value": 42,
+    "quote": "Total due: USD 42.00",
+    "page": 1
+  },
+  "vatAmount": {
+    "value": 0,
+    "quote": "Sales tax: USD 0.00",
+    "page": 1
+  },
+  "currency": {
+    "value": "USD",
+    "quote": "Total due: USD 42.00",
+    "page": 1
+  },
+  "addresseeName": {
+    "value": "Acme Studio SRL",
+    "quote": "Acme Studio SRL",
+    "page": 1
+  },
+  "addresseeVatId": {
+    "value": "IT01234567890",
+    "quote": "VAT: IT01234567890",
+    "page": 1
+  }
+}

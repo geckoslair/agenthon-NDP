@@ -1,0 +1,57 @@
+{
+  "supplierName": {
+    "value": "Rivolta Cloud Servizi S.r.l.",
+    "quote": "Rivolta Cloud Servizi S.r.l.",
+    "page": 1
+  },
+  "supplierCountry": {
+    "value": "IT",
+    "quote": "20100 Milano, Italy",
+    "page": 1
+  },
+  "supplierTaxId": {
+    "value": "IT99999999990",
+    "quote": "P.IVA: IT99999999990",
+    "page": 1
+  },
+  "invoiceNumber": {
+    "value": "FT-118",
+    "quote": "Fattura n.: FT-118",
+    "page": 1
+  },
+  "invoiceDate": {
+    "value": "2026-10-10",
+    "quote": "Data fattura: 2026-10-10",
+    "page": 1
+  },
+  "documentType": {
+    "value": "invoice",
+    "quote": "FATTURA",
+    "page": 1
+  },
+  "totalAmount": {
+    "value": 50,
+    "quote": "Totale da pagare: EUR 50.00",
+    "page": 1
+  },
+  "vatAmount": {
+    "value": 0,
+    "quote": "Importo IVA: EUR 0.00",
+    "page": 1
+  },
+  "currency": {
+    "value": "EUR",
+    "quote": "Totale da pagare: EUR 50.00",
+    "page": 1
+  },
+  "addresseeName": {
+    "value": "Acme Studio SRL",
+    "quote": "Acme Studio SRL",
+    "page": 1
+  },
+  "addresseeVatId": {
+    "value": "IT01234567890",
+    "quote": "VAT: IT01234567890",
+    "page": 1
+  }
+}

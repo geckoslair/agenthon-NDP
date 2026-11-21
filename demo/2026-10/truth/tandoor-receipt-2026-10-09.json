@@ -1,0 +1,57 @@
+{
+  "supplierName": {
+    "value": "Tandoor Labs Pvt Ltd",
+    "quote": "Tandoor Labs Pvt Ltd",
+    "page": 1
+  },
+  "supplierCountry": {
+    "value": "IN",
+    "quote": "Bengaluru 560001, India",
+    "page": 1
+  },
+  "supplierTaxId": {
+    "value": "29AAAAA9999A1Z5",
+    "quote": "GSTIN: 29AAAAA9999A1Z5",
+    "page": 1
+  },
+  "invoiceNumber": {
+    "value": null,
+    "quote": null,
+    "page": null
+  },
+  "invoiceDate": {
+    "value": "2026-10-09",
+    "quote": "Invoice date: Oct 9, 2026",
+    "page": 1
+  },
+  "documentType": {
+    "value": "receipt",
+    "quote": "PAYMENT RECEIPT",
+    "page": 1
+  },
+  "totalAmount": {
+    "value": 29,
+    "quote": "Total due: USD 29.00",
+    "page": 1
+  },
+  "vatAmount": {
+    "value": null,
+    "quote": null,
+    "page": null
+  },
+  "currency": {
+    "value": "USD",
+    "quote": "Total due: USD 29.00",
+    "page": 1
+  },
+  "addresseeName": {
+    "value": "Acme Studio SRL",
+    "quote": "Acme Studio SRL",
+    "page": 1
+  },
+  "addresseeVatId": {
+    "value": "IT01234567890",
+    "quote": "VAT: IT01234567890",
+    "page": 1
+  }
+}

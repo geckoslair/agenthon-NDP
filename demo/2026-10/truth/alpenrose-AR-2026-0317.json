@@ -1,0 +1,57 @@
+{
+  "supplierName": {
+    "value": "Alpenrose Security AG",
+    "quote": "Alpenrose Security AG",
+    "page": 1
+  },
+  "supplierCountry": {
+    "value": "CH",
+    "quote": "8001 Zurich, Switzerland",
+    "page": 1
+  },
+  "supplierTaxId": {
+    "value": "CHE-999.999.991 MWST",
+    "quote": "UID: CHE-999.999.991 MWST",
+    "page": 1
+  },
+  "invoiceNumber": {
+    "value": "AR-2026-0317",
+    "quote": "Invoice no.: AR-2026-0317",
+    "page": 1
+  },
+  "invoiceDate": {
+    "value": "2026-10-08",
+    "quote": "Invoice date: 8 October 2026",
+    "page": 1
+  },
+  "documentType": {
+    "value": "invoice",
+    "quote": "INVOICE",
+    "page": 1
+  },
+  "totalAmount": {
+    "value": 480,
+    "quote": "Total due: CHF 480.00",
+    "page": 1
+  },
+  "vatAmount": {
+    "value": 0,
+    "quote": "Sales tax: CHF 0.00",
+    "page": 1
+  },
+  "currency": {
+    "value": "CHF",
+    "quote": "Total due: CHF 480.00",
+    "page": 1
+  },
+  "addresseeName": {
+    "value": "Acme Studio SRL",
+    "quote": "Acme Studio SRL",
+    "page": 1
+  },
+  "addresseeVatId": {
+    "value": "IT01234567890",
+    "quote": "VAT: IT01234567890",
+    "page": 1
+  }
+}

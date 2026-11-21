@@ -1,0 +1,57 @@
+{
+  "supplierName": {
+    "value": "Glyph Design Software B.V.",
+    "quote": "Glyph Design Software B.V.",
+    "page": 1
+  },
+  "supplierCountry": {
+    "value": "NL",
+    "quote": "1011 AA Amsterdam, Netherlands",
+    "page": 1
+  },
+  "supplierTaxId": {
+    "value": "NL999999991B01",
+    "quote": "BTW: NL999999991B01",
+    "page": 1
+  },
+  "invoiceNumber": {
+    "value": "R-88",
+    "quote": "Invoice no.: R-88",
+    "page": 1
+  },
+  "invoiceDate": {
+    "value": "2026-10-05",
+    "quote": "Invoice date: 5 October 2026",
+    "page": 1
+  },
+  "documentType": {
+    "value": "invoice",
+    "quote": "INVOICE",
+    "page": 1
+  },
+  "totalAmount": {
+    "value": 24,
+    "quote": "Total due: EUR 24.00",
+    "page": 1
+  },
+  "vatAmount": {
+    "value": 0,
+    "quote": "VAT 0% (reverse charge): EUR 0.00",
+    "page": 1
+  },
+  "currency": {
+    "value": "EUR",
+    "quote": "Total due: EUR 24.00",
+    "page": 1
+  },
+  "addresseeName": {
+    "value": "Acme Studio SRL",
+    "quote": "Acme Studio SRL",
+    "page": 1
+  },
+  "addresseeVatId": {
+    "value": "IT01234567890",
+    "quote": "VAT: IT01234567890",
+    "page": 1
+  }
+}

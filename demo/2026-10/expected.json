@@ -1,0 +1,39 @@
+[
+  {
+    "fileName": "lumen-LT-20266.pdf",
+    "code": "FOREIGN_VAT_CHARGED"
+  },
+  {
+    "fileName": "cobalt-CCI-55021.pdf",
+    "code": "ADDRESSED_TO_PERSON"
+  },
+  {
+    "fileName": "vesper-VC-26-1037.pdf",
+    "code": "WRONG_MONTH"
+  },
+  {
+    "fileName": "rivolta-FT-118.pdf",
+    "code": "NOT_FOREIGN"
+  },
+  {
+    "fileName": "nimbus-INV-1001-copy.pdf",
+    "code": "DUPLICATE"
+  },
+  {
+    "fileName": "tandoor-receipt-2026-10-09.pdf",
+    "code": "UNREADABLE_FIELD"
+  },
+  {
+    "fileName": null,
+    "code": "MISSING_EXPECTED_INVOICE",
+    "supplierId": "marlow"
+  },
+  {
+    "fileName": "elowen-EL-007.pdf",
+    "code": "OUT_OF_KNOWN_RULES"
+  },
+  {
+    "fileName": "sable-ST-3302.pdf",
+    "code": "SUPPLIER_FACTS_UNKNOWN"
+  }
+]

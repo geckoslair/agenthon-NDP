@@ -1,0 +1,57 @@
+{
+  "supplierName": {
+    "value": "Elowen Thistledown",
+    "quote": "Elowen Thistledown",
+    "page": 1
+  },
+  "supplierCountry": {
+    "value": "GB",
+    "quote": "Bristol BS1 0XX, United Kingdom",
+    "page": 1
+  },
+  "supplierTaxId": {
+    "value": null,
+    "quote": null,
+    "page": null
+  },
+  "invoiceNumber": {
+    "value": "EL-007",
+    "quote": "Invoice no.: EL-007",
+    "page": 1
+  },
+  "invoiceDate": {
+    "value": "2026-10-20",
+    "quote": "Invoice date: 20 October 2026",
+    "page": 1
+  },
+  "documentType": {
+    "value": "invoice",
+    "quote": "INVOICE",
+    "page": 1
+  },
+  "totalAmount": {
+    "value": 150,
+    "quote": "Total due: GBP 150.00",
+    "page": 1
+  },
+  "vatAmount": {
+    "value": null,
+    "quote": null,
+    "page": null
+  },
+  "currency": {
+    "value": "GBP",
+    "quote": "Total due: GBP 150.00",
+    "page": 1
+  },
+  "addresseeName": {
+    "value": "Acme Studio SRL",
+    "quote": "Acme Studio SRL",
+    "page": 1
+  },
+  "addresseeVatId": {
+    "value": "IT01234567890",
+    "quote": "VAT: IT01234567890",
+    "page": 1
+  }
+}
