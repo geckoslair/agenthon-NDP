@@ -7,6 +7,15 @@ export interface Sourced<T> {
   quote: string | null;
   /** 1-based page number in the PDF, when known. */
   page: number | null;
+  /**
+   * Where the value comes from. Absent or "document": read from the PDF. "manual": typed
+   * by a person to complete a field the extraction could not read; then quote and page
+   * are null (no citation is invented) and correctedBy / correctedAt say who and when.
+   */
+  origin?: "document" | "manual";
+  correctedBy?: string;
+  /** ISO timestamp of the manual correction. */
+  correctedAt?: string;
 }
 
 export interface ExtractedInvoice {
