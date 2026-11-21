@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 import { Nav } from "@/components/nav";
 import "./globals.css";
 
@@ -19,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               aria-label="Probata, panoramica"
               className="font-serif text-2xl hover:text-foreground"
             >
-              Probata
+              <Logo height={32} className="text-foreground" />
             </Link>
             <Nav />
           </div>

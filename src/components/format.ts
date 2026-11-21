@@ -165,11 +165,27 @@ export function formatMonth(month: string): string {
   return m ? `${MONTHS[Number(m[2]) - 1]} ${m[1]}` : month;
 }
 
-/** SQLite "YYYY-MM-DD HH:MM:SS" (UTC) -> "21/11/2026 14:05". Null becomes an em dash. */
+const ROME = new Intl.DateTimeFormat("it-IT", {
+  timeZone: "Europe/Rome",
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/**
+ * SQLite stores UTC as "YYYY-MM-DD HH:MM:SS"; shown in Rome time as "21/11/2026 15:05".
+ * Null becomes an em dash; text that is not a SQLite date is returned unchanged.
+ */
 export function formatDateTime(value: string | null | undefined): string {
   if (!value) return "—";
-  const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/.exec(value);
-  return m ? `${m[3]}/${m[2]}/${m[1]} ${m[4]}:${m[5]}` : value;
+  const m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/.exec(value);
+  if (!m) return value;
+  const date = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] ?? 0)));
+  const p = Object.fromEntries(ROME.formatToParts(date).map((x) => [x.type, x.value]));
+  return `${p.day}/${p.month}/${p.year} ${p.hour}:${p.minute}`;
 }
 
 /** "1234.5","EUR" -> "1.234,50 EUR". Null amount becomes "non trovato". */

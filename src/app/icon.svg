@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 31 131 131">
+  <style>
+    .bg { fill: #f6f3ec } .ink { fill: #141414 }
+    @media (prefers-color-scheme: dark) { .bg { fill: #151513 } .ink { fill: #f1ede4 } }
+  </style>
+  <rect x="30" y="31" width="131" height="131" rx="24" class="bg"/>
+  <rect x="40" y="41" width="74" height="74" rx="10" class="ink"/>
+  <circle cx="114" cy="115" r="37" class="ink"/>
+  <path d="M114 105C114 110.523 109.523 115 104 115H77C77 94.5655 93.5655 78 114 78V105Z" class="bg"/>
+</svg>

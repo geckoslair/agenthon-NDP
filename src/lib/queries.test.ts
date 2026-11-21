@@ -254,3 +254,38 @@ describe("audit log", () => {
     expect(listAudit(db, null, 1)).toHaveLength(1);
   });
 });
+
+describe("channel from invoices.source", () => {
+  it("prefers invoices.source over the supplier channel and falls back when null", () => {
+    const a = addInvoice("a.pdf", "nimbus", "ok");
+    const b = addInvoice("b.pdf", "orbit", "ok");
+    db.prepare("UPDATE invoices SET source = 'browser', origin = 'portal/orbit' WHERE id = ?").run(
+      a,
+    );
+    expect(getInvoice(db, a)).toMatchObject({ channel: "browser", origin: "portal/orbit" });
+    expect(getInvoice(db, b)).toMatchObject({ channel: "api", origin: null });
+    expect(listInvoices(db, 1).map((i) => i.channel)).toEqual(["browser", "api"]);
+    const counts = Object.fromEntries(getOverview(db).channels.map((c) => [c.channel, c.count]));
+    expect(counts).toEqual({ browser: 1, api: 1 });
+  });
+});
+
+describe("warnings", () => {
+  it("lists warnings of the last run only", () => {
+    const ins = db.prepare("INSERT INTO audit_log (run_id, actor, step, detail) VALUES (?,?,?,?)");
+    ins.run(1, "autopilot", "warning", "Fonte non raggiungibile");
+    ins.run(1, "autopilot", "extract", "ok");
+    ins.run(1, "autopilot", "warning", null);
+    db.prepare("INSERT INTO runs (month) VALUES ('2026-11')").run();
+    ins.run(2, "autopilot", "warning", "Avviso nuovo");
+    expect(getOverview(db).warnings).toEqual(["Avviso nuovo"]);
+    expect(getOverview(openDb(":memory:")).warnings).toEqual([]);
+  });
+
+  it("gives a text for a warning without detail", () => {
+    db.prepare(
+      "INSERT INTO audit_log (run_id, actor, step) VALUES (1,'autopilot','warning')",
+    ).run();
+    expect(getOverview(db).warnings).toEqual(["Avviso senza dettaglio"]);
+  });
+});

@@ -59,6 +59,8 @@ export interface Overview {
   openExceptions: number;
   pendingApprovals: number;
   package: { id: number; status: string; sentAt: string | null } | null;
+  /** Non-blocking problems of the last run (audit step 'warning'), oldest first. */
+  warnings: string[];
 }
 
 export function getOverview(db: Db): Overview {
@@ -75,11 +77,12 @@ export function getOverview(db: Db): Overview {
       openExceptions: 0,
       pendingApprovals: 0,
       package: null,
+      warnings: [],
     };
   }
   const channels = db
     .prepare(
-      `SELECT COALESCE(s.invoice_source, 'unknown') AS channel, COUNT(*) AS count
+      `SELECT COALESCE(i.source, s.invoice_source, 'unknown') AS channel, COUNT(*) AS count
        FROM invoices i LEFT JOIN suppliers s ON s.id = i.supplier_id
        WHERE i.run_id = ? GROUP BY channel ORDER BY count DESC, channel`,
     )
@@ -118,6 +121,11 @@ export function getOverview(db: Db): Overview {
     openExceptions: open.length,
     pendingApprovals: pending,
     package: pkg ? { id: pkg.id, status: pkg.status, sentAt: pkg.sent_at } : null,
+    warnings: (
+      db
+        .prepare("SELECT detail FROM audit_log WHERE run_id = ? AND step = 'warning' ORDER BY id")
+        .all(run.id) as { detail: string | null }[]
+    ).map((w) => w.detail ?? "Avviso senza dettaglio"),
   };
 }
 
@@ -208,6 +216,8 @@ export interface InvoiceDetail {
   supplierName: string | null;
   /** How the invoice reached us: the supplier's collection channel, if known. */
   channel: string | null;
+  /** Where the document came from (mailbox, API URL, portal page), if recorded. */
+  origin: string | null;
   /** null when the stored JSON cannot be read. */
   extracted: ExtractedInvoice | null;
 }
@@ -231,6 +241,8 @@ export function getInvoice(db: Db, id: number): InvoiceDetail | null {
         supplier_id: string | null;
         supplier_name: string | null;
         invoice_source: string | null;
+        source: string | null;
+        origin: string | null;
         extracted: string;
       }
     | undefined;
@@ -249,7 +261,8 @@ export function getInvoice(db: Db, id: number): InvoiceDetail | null {
     status: r.status,
     supplierId: r.supplier_id,
     supplierName: r.supplier_name,
-    channel: r.invoice_source,
+    channel: r.source ?? r.invoice_source,
+    origin: r.origin,
     extracted,
   };
 }
@@ -477,7 +490,7 @@ export function listInvoices(db: Db, runId: number): InvoiceListRow[] {
   return (
     db
       .prepare(
-        `SELECT i.id, i.file_name, i.status, s.name AS supplier_name, s.invoice_source
+        `SELECT i.id, i.file_name, i.status, s.name AS supplier_name, s.invoice_source, i.source
          FROM invoices i LEFT JOIN suppliers s ON s.id = i.supplier_id
          WHERE i.run_id = ? ORDER BY i.id`,
       )
@@ -487,12 +500,13 @@ export function listInvoices(db: Db, runId: number): InvoiceListRow[] {
       status: string;
       supplier_name: string | null;
       invoice_source: string | null;
+      source: string | null;
     }[]
   ).map((r) => ({
     id: r.id,
     fileName: r.file_name,
     status: r.status,
     supplierName: r.supplier_name,
-    channel: r.invoice_source,
+    channel: r.source ?? r.invoice_source,
   }));
 }

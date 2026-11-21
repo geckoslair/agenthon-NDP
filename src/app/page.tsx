@@ -17,7 +17,7 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-const CHANNELS = ["email", "api", "browser"];
+const CHANNELS = ["email", "billing_api", "browser"];
 
 function Row({ label, hint, value }: { label: string; hint?: string; value: number }) {
   return (
@@ -46,6 +46,20 @@ export default function Home() {
         title="Il giro del mese"
         lead="Probata raccoglie le fatture estere, controlla ogni dato e si ferma a ogni dubbio. Non invia nulla senza la tua approvazione."
       />
+
+      {o.warnings.length > 0 && (
+        <section aria-labelledby="warn" className="mb-8 rounded-[14px] border border-warn p-5">
+          <h2 id="warn" className="mb-3">
+            <StateTag label="Da verificare" tone="warn" />{" "}
+            <span className="ml-2">Avvisi dell'ultimo giro</span>
+          </h2>
+          <ul className="list-disc pl-5">
+            {o.warnings.map((w, i) => (
+              <li key={i}>{w}</li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="grid gap-5 lg:grid-cols-[3fr_2fr]">
         <Card>

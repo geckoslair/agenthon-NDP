@@ -35,7 +35,9 @@ describe("format helpers", () => {
   it("formats months, dates and amounts", () => {
     expect(formatMonth("2026-10")).toBe("ottobre 2026");
     expect(formatMonth("oops")).toBe("oops");
-    expect(formatDateTime("2026-11-21 14:05:09")).toBe("21/11/2026 14:05");
+    expect(formatDateTime("2026-11-21 14:05:09")).toBe("21/11/2026 15:05"); // UTC to Rome, winter
+    expect(formatDateTime("2026-07-01 23:30:00")).toBe("02/07/2026 01:30"); // summer, next day
+    expect(formatDateTime("not a date")).toBe("not a date");
     expect(formatDateTime(null)).toBe("—");
     expect(formatAmount(12345.5, "EUR")).toBe("12.345,50 EUR");
     expect(formatAmount(1234.5)).toBe("1234,50");

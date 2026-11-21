@@ -52,6 +52,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         <span className="text-ink-2">
           File {inv.fileName} · canale: {channelLabel(inv.channel)}
           {inv.month ? ` · mese ${inv.month}` : ""}
+          {inv.origin ? ` · origine: ${inv.origin}` : ""}
         </span>
       </div>
 
