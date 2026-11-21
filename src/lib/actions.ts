@@ -14,6 +14,7 @@ import {
 } from "./compliance";
 import {
   approvePackage,
+  excludeInvoice,
   completeUnreadableFields,
   deliverPackage,
   resetDemo,
@@ -326,5 +327,21 @@ export async function completeUnreadableFieldsAction(
             : "Valori salvati."
           : "Non ho potuto salvare i valori."),
     };
+  });
+}
+
+/** Excludes the invoice of an exception from this closure (the PDF stays). Author: session user. */
+export async function excludeInvoiceAction(
+  _prev: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  void _prev;
+  const exceptionId = id(formData, "id");
+  if (!exceptionId) return { ok: false, message: "Eccezione non valida." };
+  return guarded(() => {
+    const r = excludeInvoice(getDb(), exceptionId, currentUser().name);
+    return r.ok
+      ? { ok: true, message: "Fattura esclusa dalla chiusura. Il PDF resta disponibile." }
+      : { ok: false, message: r.error ?? "Non è stato possibile escludere la fattura." };
   });
 }

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { UnreadableForm } from "@/components/unreadable-form";
-import { resolveExceptionAction } from "@/lib/actions";
+import { excludeInvoiceAction, resolveExceptionAction } from "@/lib/actions";
 import { getDb } from "@/lib/db";
 import { unreadableFields } from "@/lib/pipeline";
 import { listExceptions, type ExceptionRow } from "@/lib/queries";
@@ -32,6 +32,8 @@ function Subject({ e }: { e: ExceptionRow }) {
     </p>
   );
 }
+
+const EXCLUDABLE = ["WRONG_MONTH", "FOREIGN_VAT_CHARGED", "ADDRESSED_TO_PERSON"];
 
 function ExceptionCard({ e }: { e: ExceptionRow }) {
   const label = exceptionLabel(e.code);
@@ -81,6 +83,22 @@ function ExceptionCard({ e }: { e: ExceptionRow }) {
         </div>
         {open && unreadable ? (
           <UnreadableForm exceptionId={e.id} fields={unreadableFields(getDb(), e.id)} />
+        ) : open && EXCLUDABLE.includes(e.code) ? (
+          <ActionForm
+            action={excludeInvoiceAction}
+            className="flex flex-col gap-3 border-t border-line pt-5"
+          >
+            <input type="hidden" name="id" value={e.id} />
+            <p className="text-sm text-ink-2">
+              Escludendo la fattura la togli da questa chiusura: il PDF resta, nulla viene spostato
+              o dichiarato valido.
+            </p>
+            <div>
+              <SubmitButton variant="outline" pendingLabel="Escludo…">
+                Escludi
+              </SubmitButton>
+            </div>
+          </ActionForm>
         ) : open ? (
           <ActionForm
             action={resolveExceptionAction}
