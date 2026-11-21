@@ -68,12 +68,12 @@ function portalStandIn(outDir: string, isMissing: (f: string) => boolean): Invoi
 }
 
 describe.skipIf(!hasDemo)("demo month 2026-10", () => {
-  it("raises exactly the exceptions in expected.json", async () => {
+  it("raises exactly the exceptions in expected.json, on a second run too", async () => {
     const expected = JSON.parse(
       fs.readFileSync(path.join(demoDir, MONTH, "expected.json"), "utf8"),
     ) as { fileName: string | null; code: string; supplierId?: string }[];
     const db = openDb(":memory:");
-    const summary = await runMonth(db, MONTH, {
+    const options = {
       demoDir,
       dataDir: fs.mkdtempSync(path.join(os.tmpdir(), "probata-demo-")),
       baseUrl: "http://mock.test",
@@ -81,7 +81,10 @@ describe.skipIf(!hasDemo)("demo month 2026-10", () => {
       fetchImpl: mockFetch,
       sourceFactory: (kind, ctx) =>
         kind === "browser" ? portalStandIn(ctx.outDir, ctx.isMissing) : null,
-    });
+    } satisfies Parameters<typeof runMonth>[2];
+    const first = await runMonth(db, MONTH, options);
+    const summary = await runMonth(db, MONTH, options);
+    expect(summary.runId).toBe(first.runId + 1);
     const rows = db
       .prepare(
         `SELECT i.file_name AS fileName, e.code, e.supplier_id AS supplierId
@@ -91,6 +94,8 @@ describe.skipIf(!hasDemo)("demo month 2026-10", () => {
     const key = (e: { fileName: string | null; code: string; supplierId?: string | null }) =>
       `${e.fileName ?? e.supplierId}:${e.code}`;
     expect(rows.map(key).sort()).toEqual(expected.map(key).sort());
+    const helix = db.prepare("SELECT tax_id, status FROM suppliers WHERE id = 'helix'").get();
+    expect(helix).toEqual({ tax_id: "IE9999992B", status: "unknown" });
     expect(summary.warnings).toEqual([]);
 
     // Every document of sources.json was collected, each through its own channel.
@@ -101,7 +106,9 @@ describe.skipIf(!hasDemo)("demo month 2026-10", () => {
       for (const f of files) channel.set(f, "billing_api");
     for (const files of Object.values(sources.browser))
       for (const f of files) channel.set(f, "browser");
-    const invoices = db.prepare("SELECT file_name, source FROM invoices").all() as {
+    const invoices = db
+      .prepare("SELECT file_name, source FROM invoices WHERE run_id = ?")
+      .all(summary.runId) as {
       file_name: string;
       source: string;
     }[];
@@ -110,10 +117,12 @@ describe.skipIf(!hasDemo)("demo month 2026-10", () => {
 
     // The unknown supplier whose facts are on its page is proposed, not blocked.
     const proposed = db
-      .prepare("SELECT subject FROM audit_log WHERE step = 'supplier_proposed'")
-      .all();
+      .prepare("SELECT subject FROM audit_log WHERE step = 'supplier_proposed' AND run_id = ?")
+      .all(summary.runId);
     expect(proposed).toEqual([{ subject: "supplier:helix" }]);
-    const pkg = db.prepare("SELECT status, subject FROM outbox WHERE kind = 'package'").get() as {
+    const pkg = db
+      .prepare("SELECT status, subject FROM outbox WHERE kind = 'package' AND run_id = ?")
+      .get(summary.runId) as {
       status: string;
       subject: string;
     };

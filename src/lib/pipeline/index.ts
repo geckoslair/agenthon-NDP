@@ -371,6 +371,7 @@ export async function runMonth(
     const country = item.extracted.supplierCountry.value?.toUpperCase() ?? null;
     if (
       item.supplier !== null &&
+      item.supplier.status === "approved" &&
       !item.supplier.taxId &&
       item.extracted.supplierTaxId.value === null &&
       country !== null &&
@@ -447,6 +448,11 @@ export async function runMonth(
       );
     }
     storeFacts(db, id, result.facts);
+    // Registry fields follow the sourced facts, never a guess.
+    const factValue = (name: string) => result.facts.find((f) => f.fact === name)?.value ?? null;
+    db.prepare(
+      "UPDATE suppliers SET name = COALESCE(?, name), country = COALESCE(?, country), tax_id = COALESCE(?, tax_id) WHERE id = ? AND status = 'unknown'",
+    ).run(factValue("legal_entity"), factValue("country"), factValue("tax_id"), id);
     for (const f of result.facts) {
       log("research_fact", `supplier:${id}`, `${f.fact} = ${f.value} | "${f.quote}"`, f.sourceUrl);
     }
