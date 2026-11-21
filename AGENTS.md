@@ -62,7 +62,8 @@ Commands: `npm run dev`, `npm test`, `npm run typecheck`, `npm run format`,
 Run `npm test` and `npm run typecheck` before every push.
 
 Live demo: https://web-production-32589d1c.up.railway.app (Railway project
-`probata`). Pushes to `main` do not redeploy on their own: run `railway up`.
+`probata`). Railway redeploys on every push to `main`; `railway up` deploys
+the local tree by hand.
 
 Not built: self-invoice XML and SdI, real mailbox or bank connections, VIES
 lookup, supplier selection at the quoting stage. Sending is simulated. Live
