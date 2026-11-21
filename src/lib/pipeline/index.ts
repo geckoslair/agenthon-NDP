@@ -718,4 +718,9 @@ export {
 
 export { completeUnreadableFields, unreadableFields, MANUAL_FIELDS } from "./manual-fields";
 
-export { excludeInvoice } from "./workflow";
+export {
+  correctionStatus,
+  excludeInvoice,
+  requestCorrection,
+  type CorrectionState,
+} from "./workflow";

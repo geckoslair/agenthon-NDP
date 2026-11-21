@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { openDb, type Db } from "../db";
-import { excludeInvoice, runMonth } from "./index";
+import { decideOutgoing, markSent } from "../audit";
+import { correctionStatus, excludeInvoice, requestCorrection, runMonth } from "./index";
 import { fakeFetch, makeMonth, MONTH } from "./__fixtures__/make-month";
 
 async function setup() {
@@ -84,5 +85,62 @@ describe("excludeInvoice", () => {
     expect(excludeInvoice(db, person.id, "Anna").ok).toBe(true);
     expect(excludeInvoice(db, person.id, "Anna").ok).toBe(false);
     expect(excludeInvoice(db, 9999, "Anna").ok).toBe(false);
+  });
+});
+
+describe("requestCorrection and correctionStatus", () => {
+  it("queues one templated request, dedupes, and keeps the exception open after approval and send", async () => {
+    const { db } = await setup();
+    const vat = ex(db, "FOREIGN_VAT_CHARGED");
+    expect(correctionStatus(db, vat.id)).toEqual({ state: "none" });
+    const first = requestCorrection(db, vat.id, "Anna");
+    expect(first.ok).toBe(true);
+    const mail = db
+      .prepare("SELECT kind, template, status, body FROM outbox WHERE id = ?")
+      .get(first.outboxId) as {
+      kind: string;
+      template: string;
+      status: string;
+      body: string;
+    };
+    expect(mail).toMatchObject({
+      kind: "supplier_request",
+      template: "ask_correction",
+      status: "pending",
+    });
+    expect(mail.body).toContain("77");
+    expect(mail.body).toContain("senza IVA");
+    expect(correctionStatus(db, vat.id).state).toBe("awaiting_approval");
+    const again = requestCorrection(db, vat.id, "Anna");
+    expect(again).toEqual({ ok: true, outboxId: first.outboxId, alreadyRequested: true });
+    expect(db.prepare("SELECT COUNT(*) AS n FROM corrections").get()).toEqual({ n: 1 });
+
+    decideOutgoing(db, first.outboxId!, "approved", "Anna");
+    expect(correctionStatus(db, vat.id).state).toBe("approved");
+    markSent(db, first.outboxId!);
+    expect(correctionStatus(db, vat.id).state).toBe("sent");
+    expect(requestCorrection(db, vat.id, "Anna").alreadyRequested).toBe(true);
+    const state = db
+      .prepare(
+        "SELECT e.status, i.status AS inv FROM exceptions e JOIN invoices i ON i.id = e.invoice_id WHERE e.id = ?",
+      )
+      .get(vat.id);
+    expect(state).toEqual({ status: "open", inv: "exception" });
+    expect(
+      db.prepare("SELECT actor FROM audit_log WHERE step = 'correction_requested'").get(),
+    ).toEqual({ actor: "Anna" });
+  });
+
+  it("allows a new request after a rejected one, and refuses other codes", async () => {
+    const { db } = await setup();
+    const person = ex(db, "ADDRESSED_TO_PERSON");
+    const first = requestCorrection(db, person.id, "Anna");
+    decideOutgoing(db, first.outboxId!, "rejected", "Anna");
+    expect(correctionStatus(db, person.id).state).toBe("rejected");
+    const second = requestCorrection(db, person.id, "Anna");
+    expect(second.alreadyRequested).toBeUndefined();
+    expect(second.outboxId).not.toBe(first.outboxId);
+    expect(requestCorrection(db, ex(db, "DUPLICATE").id, "Anna").ok).toBe(false);
+    expect(requestCorrection(db, person.id, "").ok).toBe(false);
   });
 });
