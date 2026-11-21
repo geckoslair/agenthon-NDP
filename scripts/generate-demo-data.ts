@@ -1156,7 +1156,7 @@ Supplier id = file name prefix before the first "-". Tax ids are fake.
 | rivolta-FT-118.pdf | NOT_FOREIGN (Italian supplier) |
 | nimbus-INV-1001b.pdf | DUPLICATE of nimbus-INV-1001.pdf |
 | tandoor-receipt-2026-10-09.pdf | UNREADABLE_FIELD (no invoice number printed) |
-| (none) | MISSING_EXPECTED_INVOICE: marlow, recurring, card charge c-MARLOW with no invoice |
+| (none) | MISSING_EXPECTED_INVOICE: marlow, recurring, card charge MARLOW FONTS (c010) with no invoice |
 | elowen-EL-007.pdf | OUT_OF_KNOWN_RULES (private individual outside the EU, no tax id) |
 | helix-HX-90017.pdf | Unknown supplier, researchable: /mock/portal/helix/billing-info states the facts. No exception expected |
 | sable-ST-3302.pdf | Unknown supplier, not researchable: the invoice prints an EIN but its page omits tax id and VAT treatment, so the VAT treatment stays unknown. SUPPLIER_FACTS_UNKNOWN |

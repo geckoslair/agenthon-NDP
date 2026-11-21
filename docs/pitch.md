@@ -8,7 +8,7 @@ quoted. Tax rules are as reported by the accountant, not verified.
 ## (a) Submission description (max 1000 characters)
 
 ```text
-Probata prepares the monthly package of foreign purchase invoices that a small Italian software house gives its accountant. It collects invoices from email, supplier billing APIs and supplier dashboards (browser automation), reads each value with its source quote and page, validates every invoice with deterministic rules (not the model), reconciles invoices with card charges and researches unknown suppliers, keeping the source of each fact and answering "unknown" when there is none. It stops at every exception (foreign VAT, wrong month, duplicate, missing or misaddressed invoice, cases outside known rules) and sends nothing without a person's approval. Every step goes to an append-only audit log. Sending and the three sources are simulated on synthetic data. No pre-existing components: all built today. Libraries: Next.js, React, SQLite, Playwright, pdfkit, mailparser, archiver, zod, Tailwind, shadcn/ui, Vitest, Gemini SDK.
+Probata prepares the monthly package of foreign purchase invoices that a small Italian software house gives its accountant. It collects invoices from email, supplier billing APIs and supplier dashboards (browser automation), reads each value with its quote and page, validates every invoice with deterministic rules (not the model), reconciles invoices with card charges and researches unknown suppliers, keeping the source of each fact and answering "unknown" when there is none. It stops at every exception (foreign VAT, wrong month, duplicate, missing or misaddressed invoice, unknown rules) and sends nothing without a person's approval. Every step goes to an append-only audit log. For small Italian software houses and SMEs buying from foreign suppliers. Sending and the three sources are simulated on synthetic data. No pre-existing components: all built today. Libraries: Next.js, React, SQLite, Playwright, pdfkit, mailparser, archiver, zod, Tailwind, shadcn/ui, Vitest, Gemini SDK.
 ```
 
 Character count (including spaces): see the check at the end of this file;
@@ -47,7 +47,7 @@ una persona, e tutto finisce nel registro."
 **Demo dal vivo (1:00 – 2:30)**: copione cliccato qui sotto.
 
 "Ottobre 2026, dati sintetici di una società inventata. Avvio il giro: 18
-documenti da tre canali, dieci eccezioni, ognuna con la prova accanto. Qui
+documenti da tre canali, nove eccezioni aperte, ognuna con la prova accanto. Qui
 l'IVA tedesca addebitata: ecco la riga citata. Qui una fattura intestata a una
 persona. Qui un fornitore ricorrente senza fattura. Helix è nuovo: sulla sua
 pagina Probata trova soggetto, paese, partita IVA e che fattura senza IVA alle
@@ -78,27 +78,29 @@ le aziende con lo stesso problema. Probata fa il lavoro, e chiede prima."
 
 ## (c) Click-by-click demo script (about 90 seconds of the three minutes)
 
-Labels are the ones in the current Italian interface; adjust if the
-interface changed. Start with the app running (`npm run build && npm start`,
-Chromium installed with `npx playwright install chromium`), a clean demo
-database, and a backup video of this same path ready.
+Walked through headless on `main` (commit `2308f1d` plus the interface at
+that time) on 21 November, at the end of the data stream's work. Labels are
+those of the Italian interface then; re-check after the 16:15 freeze. Start
+with the app running (`npm run build && npm start`, Chromium installed with
+`npx playwright install chromium`) and a backup video of this same path.
+What the run shows: 18 documenti, **9 eccezioni aperte**, 10 fatture nel
+pacchetto, 2 invii in attesa di approvazione.
 
-| Time | Click                                                                                                               | Say / point at                                                                        |
-| ---- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 1:05 | **Panoramica**, press **Ripristina demo**                                                                           | "Parto da zero: ottobre 2026, dati sintetici."                                        |
-| 1:10 | Press **Avvia il giro del mese**                                                                                    | Counters fill in: email, API, browser. 18 documenti.                                  |
-| 1:20 | Read **Pronte / Bloccate / Mancanti**                                                                               | "Quello che è pulito passa. Il resto aspetta una persona."                            |
-| 1:25 | **Eccezioni**, the FOREIGN_VAT_CHARGED one (Lumen)                                                                  | The evidence shows the quoted line "VAT 19%: EUR 15.20".                              |
-| 1:35 | Open the invoice (**fatture**) detail                                                                               | Each value with its quote and page: "non c'è un valore senza fonte".                  |
-| 1:45 | Back in **Eccezioni**: the person-addressee (Cobalt), the missing invoice (Marlow), the card charge without invoice | "Una fattura intestata a un socio. Un ricorrente che manca, trovato oggi, non il 15." |
-| 1:55 | **Fornitori**: Helix (researched) and Sable (unknown)                                                               | Helix: each fact with source and quote. Sable: "non lo so", mail in bozza.            |
-| 2:10 | **Approvazioni**: the draft email to the supplier and the package                                                   | "Niente è partito." Show **Invio automatico** is off.                                 |
-| 2:15 | **Eccezioni**: **Segna come risolta** on one exception, enter name and reason                                       | "Ogni decisione ha un nome."                                                          |
-| 2:25 | **Approvazioni**: press **Approva** on the package                                                                  | Status: sent (simulated).                                                             |
-| 2:30 | **Registro**                                                                                                        | Audit log: what, on which input, who approved and when.                               |
+| Time | Click                                                                                                               | Say / point at                                                                                                             |
+| ---- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| 1:00 | **Panoramica**: press **Ripristina demo**                                                                           | "Parto da zero: ottobre 2026, dati sintetici."                                                                             |
+| 1:05 | Press **Avvia il giro del mese** (about 10 seconds; the browser channel runs for real)                              | Message "Giro completato: 18 fatture, 9 eccezioni, 2 invii da approvare". Email, API, Browser counters fill in.            |
+| 1:15 | Read **Pronte / Bloccate / Mancanti**                                                                               | "Quello che è pulito passa. Il resto aspetta una persona."                                                                 |
+| 1:20 | **Eccezioni**: the card **FOREIGN_VAT_CHARGED** (Lumen)                                                             | Under PROVA the quoted line "VAT 19%: EUR 15.20"; under COSA PROPONE PROBATA the proposed action.                          |
+| 1:30 | Scroll: **ADDRESSED_TO_PERSON** (Cobalt), **MISSING_EXPECTED_INVOICE** (Marlow, with the card charge)               | "Intestata a un socio. Un ricorrente che manca, trovato oggi e non il 15."                                                 |
+| 1:40 | **Fornitori**: **Helix Metrics Ltd** ("Da verificare", section DATI TROVATI)                                        | Each fact with its quote and source: the invoice for entity and country, the billing page for tax id and VAT rule.         |
+| 1:50 | **Approvazioni**: the card **RICHIESTA AL FORNITORE** (Sable); under **INVIO AUTOMATICO** the toggle is "Disattivo" | "Sable non dice il trattamento IVA: non lo deduco, preparo una mail. E non parte." Pacchetto also waiting.                 |
+| 2:05 | **Eccezioni**: on one card fill in "Come l'hai risolta" and "Il tuo nome", press **Segna come risolta**             | "Ogni decisione ha un nome." The exception moves to Risolte.                                                               |
+| 2:15 | **Approvazioni**: package card, type a name in "Il tuo nome", press **Approva**, then **Invia**                     | The card shows "Approvata da … Inviata … (simulata)". The email lists 14 suppliers, "in verifica" and "DA RICEVERE" notes. |
+| 2:25 | **Registro**                                                                                                        | One line per step: who, on which input, who approved and when; research facts with source and quote.                       |
 
-Fallback if the live run fails: play the backup video, then show **Registro**
-and the open exceptions from a previous run.
+Fallback if the live run fails: play the backup video, then show
+**Registro** and the open exceptions from a previous run.
 
 ## Character count check
 
