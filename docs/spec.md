@@ -120,8 +120,19 @@ Next.js (TypeScript) with SQLite, run locally for the demo. Gemini on
 Vertex AI (`gemini-3.8-flash`) for extraction and research. A backup video
 of the demo recorded before 17:00.
 
+## Self-invoicing, SdI and accounting **[built as a simulation]**
+
+Added at 15:30 to match the submitted description. For each valid invoice
+the run writes a self-invoice draft (TD17, simplified XML, not fiscally
+validated; 22% ordinary rate assumed and shown as "to confirm"). Non-EUR
+invoices wait for a person to supply the EUR amount. A person approves each
+draft; only then can it be submitted to the simulated SdI endpoint, and
+only submitted drafts can be exported to the simulated accounting endpoint.
+Every step is in the audit log. Code: `src/lib/compliance/`.
+
 ## Not today
 
-Generating the self-invoice XML and sending to SdI, real mailbox or bank
+A validated FatturaPA self-invoice and a real submission to SdI, a real
+accounting integration, real mailbox or bank
 connections, the sales cycle, supplier selection at the quoting stage (the
 registry built here is what will make it reliable later).

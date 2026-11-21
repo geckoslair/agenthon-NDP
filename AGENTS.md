@@ -40,22 +40,23 @@ exceptions and sends nothing without a person's approval. The spec is
 
 ## Code map
 
-| Path                                        | What                                                                                  |
-| ------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `src/lib/types.ts`                          | Domain types. Every extracted value carries its quote and page                        |
-| `src/lib/rules.ts`                          | Deterministic validation, duplicates, completeness                                    |
-| `src/lib/db.ts`                             | SQLite schema and migration                                                           |
-| `src/lib/audit.ts`                          | Append-only log and the approval gate for outgoing emails                             |
-| `src/lib/pipeline/`                         | The monthly run: `runMonth`, `resolveException`, `resetDemo`                          |
-| `src/lib/sources/`                          | The three collection channels: email, billing API, browser (Playwright)               |
-| `src/lib/research/`                         | Billing facts for unknown suppliers, each with source and quote                       |
-| `src/lib/package/`                          | The zip and the summary email for the accountant                                      |
-| `src/lib/extractor.ts`, `src/lib/gemini.ts` | Fixture extractor (default) and live Gemini (`EXTRACTOR=gemini`)                      |
-| `src/lib/voice/`, `src/app/api/brief/`      | Spoken brief with ElevenLabs, cached on disk                                          |
-| `src/lib/queries.ts`, `src/lib/actions.ts`  | Reads and server actions used by the pages                                            |
-| `src/app/`                                  | Pages: overview, `eccezioni`, `approvazioni`, `fornitori`, `registro`, `fatture/[id]` |
-| `src/app/mock/`                             | Fake supplier billing API, dashboard and billing-info pages                           |
-| `demo/2026-10/`                             | The synthetic demo month; `scripts/generate-demo-data.ts` regenerates it              |
+| Path                                          | What                                                                                  |
+| --------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `src/lib/types.ts`                            | Domain types. Every extracted value carries its quote and page                        |
+| `src/lib/rules.ts`                            | Deterministic validation, duplicates, completeness                                    |
+| `src/lib/db.ts`                               | SQLite schema and migration                                                           |
+| `src/lib/audit.ts`                            | Append-only log and the approval gate for outgoing emails                             |
+| `src/lib/pipeline/`                           | The monthly run: `runMonth`, `resolveException`, `resetDemo`                          |
+| `src/lib/sources/`                            | The three collection channels: email, billing API, browser (Playwright)               |
+| `src/lib/research/`                           | Billing facts for unknown suppliers, each with source and quote                       |
+| `src/lib/package/`                            | The zip and the summary email for the accountant                                      |
+| `src/lib/extractor.ts`, `src/lib/gemini.ts`   | Fixture extractor (default) and live Gemini (`EXTRACTOR=gemini`)                      |
+| `src/lib/compliance/`, `src/app/adempimenti/` | Self-invoice drafts (TD17), simulated SdI submission and accounting export            |
+| `src/lib/voice/`, `src/app/api/brief/`        | Spoken brief with ElevenLabs, cached on disk                                          |
+| `src/lib/queries.ts`, `src/lib/actions.ts`    | Reads and server actions used by the pages                                            |
+| `src/app/`                                    | Pages: overview, `eccezioni`, `approvazioni`, `fornitori`, `registro`, `fatture/[id]` |
+| `src/app/mock/`                               | Fake supplier billing API, dashboard and billing-info pages                           |
+| `demo/2026-10/`                               | The synthetic demo month; `scripts/generate-demo-data.ts` regenerates it              |
 
 Commands: `npm run dev`, `npm test`, `npm run typecheck`, `npm run format`,
 `npm run run-month -- 2026-10 --reset`, `npm run extract -- file.pdf 2026-10`.
@@ -65,9 +66,12 @@ Live demo: https://web-production-32589d1c.up.railway.app (Railway project
 `probata`). Railway redeploys on every push to `main`; `railway up` deploys
 the local tree by hand.
 
-Not built: self-invoice XML and SdI, real mailbox or bank connections, VIES
-lookup, supplier selection at the quoting stage. Sending is simulated. Live
-Gemini extraction works but the demo runs on the fixture extractor.
+Simulated, and labelled so in the UI: self-invoice drafts (not fiscally
+validated), submission to SdI and export to accounting (fake endpoints under
+`src/app/mock/`), the three invoice sources, every outgoing email. Not
+built: real SdI or accounting connections, real mailbox or bank connections,
+VIES lookup, supplier selection at the quoting stage. Live Gemini extraction
+works but the demo runs on the fixture extractor.
 
 ## What wins (from the brief)
 

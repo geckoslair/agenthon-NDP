@@ -13,8 +13,10 @@ append-only audit log: what, on which input, who approved.
 
 > **Prototype.** Everything runs on synthetic data. The three invoice
 > sources (mailbox, supplier billing API, supplier dashboard) and every
-> outgoing email are simulated: no real mailbox, supplier, accountant or tax
-> authority is contacted.
+> outgoing email are simulated. Self-invoice drafts are not fiscally
+> validated, and the submission to SdI and the export to accounting go to
+> fake endpoints inside this app: no real mailbox, supplier, accountant, tax
+> authority or accounting product is contacted.
 
 Live demo: https://web-production-32589d1c.up.railway.app
 
@@ -152,13 +154,24 @@ repository is public):
   bearer token; the supplier dashboards are fake pages at
   `/mock/portal/<supplier>` (login `demo` / `demo`), marked as demo pages.
   The supplier "billing and VAT FAQ" pages used for research are fake too.
+- **Self-invoicing, SdI and accounting.** For each valid invoice the
+  autopilot writes a self-invoice draft (document type TD17) as a small XML
+  file. It is a **demonstration draft, not fiscally validated**: the
+  structure is simplified, and the 22% ordinary VAT rate is an assumption to
+  confirm with an accountant. Invoices not in EUR stop and ask a person for
+  the amount in EUR; no exchange rate is invented. After a person approves a
+  draft, "submission to SdI" posts it to a fake endpoint in this app
+  (`/mock/sdi/submit`) that returns a made-up receipt or a rejection, and
+  "export to accounting" posts entries to a fake accounting endpoint
+  (`/mock/accounting/entries`). No tax authority and no accounting product
+  is contacted.
 - **Data.** All companies, people and tax ids are invented; none belongs to a
   real person or business.
 
 Not built:
 
-- The self-invoice XML and the submission to SdI (the autopilot prepares the
-  package for the accountant, who does that step).
+- A real, validated self-invoice (FatturaPA XML) and a real submission to
+  SdI; a real accounting integration. See the simulation above.
 - Real mailbox, bank or supplier connections.
 - Voice input or voice approvals. The spoken brief is output only: approvals stay a click.
 - Live VIES validation of tax ids. The tax rules in
