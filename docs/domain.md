@@ -61,19 +61,19 @@ the charge date or the receipt date.
 
 ## Recurring problems (each one is a candidate exception)
 
-| # | Problem | Root cause |
-| --- | --- | --- |
-| 1 | Invoice missing from the monthly package, found after the deadline | Manual collection; annual renewals; invoices issued at month end |
-| 2 | Invoice addressed to a partner personally, or with a personal VAT number | Account created with personal details; no check on the first invoice |
-| 3 | Foreign VAT charged instead of reverse charge | Company VAT number not entered or not validated in the supplier account |
-| 4 | Supplier tax identifier missing or invalid | No shared supplier registry |
-| 5 | Invoice and card charge do not match | Several invoices per supplier; no reconciliation |
-| 6 | Italian supplier classified as foreign | Classification from memory |
-| 7 | Credit notes and refunds handled case by case | No coded rule |
-| 8 | Invoice filed under the wrong month | Month decided by eye |
-| 9 | Gap in a recurring supplier's sequence, noticed by the accountant | No expected-invoice check upstream |
-| 10 | Two documents for one purchase (receipt plus invoice, or a reissued invoice) | No deduplication |
-| 11 | Supplier is a private individual outside the EU, or an exempt freelancer without an EU VAT number | Rare case with no known rule |
+| #   | Problem                                                                                           | Root cause                                                              |
+| --- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 1   | Invoice missing from the monthly package, found after the deadline                                | Manual collection; annual renewals; invoices issued at month end        |
+| 2   | Invoice addressed to a partner personally, or with a personal VAT number                          | Account created with personal details; no check on the first invoice    |
+| 3   | Foreign VAT charged instead of reverse charge                                                     | Company VAT number not entered or not validated in the supplier account |
+| 4   | Supplier tax identifier missing or invalid                                                        | No shared supplier registry                                             |
+| 5   | Invoice and card charge do not match                                                              | Several invoices per supplier; no reconciliation                        |
+| 6   | Italian supplier classified as foreign                                                            | Classification from memory                                              |
+| 7   | Credit notes and refunds handled case by case                                                     | No coded rule                                                           |
+| 8   | Invoice filed under the wrong month                                                               | Month decided by eye                                                    |
+| 9   | Gap in a recurring supplier's sequence, noticed by the accountant                                 | No expected-invoice check upstream                                      |
+| 10  | Two documents for one purchase (receipt plus invoice, or a reissued invoice)                      | No deduplication                                                        |
+| 11  | Supplier is a private individual outside the EU, or an exempt freelancer without an EU VAT number | Rare case with no known rule                                            |
 
 ## Measured cost
 

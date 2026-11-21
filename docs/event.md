@@ -5,14 +5,14 @@ PDF ("Regolamento – Hackathon GDG Torino 2026").
 
 ## Schedule, Saturday 21 November 2026
 
-| Time | What |
-| --- | --- |
-| 10:30–13:00 | Build time |
-| 13:00 | Lunch |
-| 14:00–17:00 | Build time |
-| **17:00** | **Submissions close** |
-| 17:15 | Finalist teams pitch to the jury |
-| 18:30 | Awards |
+| Time        | What                             |
+| ----------- | -------------------------------- |
+| 10:30–13:00 | Build time                       |
+| 13:00       | Lunch                            |
+| 14:00–17:00 | Build time                       |
+| **17:00**   | **Submissions close**            |
+| 17:15       | Finalist teams pitch to the jury |
+| 18:30       | Awards                           |
 
 ## Submission (portal, "Submit" tab)
 
@@ -20,13 +20,13 @@ PDF ("Regolamento – Hackathon GDG Torino 2026").
 your Drive folder last changed, if you add one. Anything changed after that
 doesn't count."
 
-| Field | Notes |
-| --- | --- |
-| Project name | Finalists pitch in **reverse alphabetical order** of this name |
-| Short description | Max 1000 characters. What it does and who it is for. Must list any pre-existing components used (rules, art. 7.3 c) |
-| GitHub repository | Public. https://github.com/geckoslair/agenthon-NDP |
-| Google Drive folder | Optional. Presentation and materials, shared as "Anyone with the link can view" |
-| Notes | Optional |
+| Field               | Notes                                                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Project name        | Finalists pitch in **reverse alphabetical order** of this name                                                      |
+| Short description   | Max 1000 characters. What it does and who it is for. Must list any pre-existing components used (rules, art. 7.3 c) |
+| GitHub repository   | Public. https://github.com/geckoslair/agenthon-NDP                                                                  |
+| Google Drive folder | Optional. Presentation and materials, shared as "Anyone with the link can view"                                     |
+| Notes               | Optional                                                                                                            |
 
 The repository must contain a file with the project description, the
 technologies used and the essential start instructions (rules, art. 7.3 a).
@@ -34,13 +34,13 @@ That file is `README.md`. Links must open from an account outside the team.
 
 ## Judging (rules, art. 9), 100 points
 
-| Criterion | Max |
-| --- | --- |
-| Innovation: originality of idea and approach | 25 |
-| Quality of execution: what was actually built today | 25 |
-| Feasibility: real chance of adoption in a real context | 20 |
-| Fit with the track theme | 15 |
-| Quality of the pitch, including the live demo | 15 |
+| Criterion                                              | Max |
+| ------------------------------------------------------ | --- |
+| Innovation: originality of idea and approach           | 25  |
+| Quality of execution: what was actually built today    | 25  |
+| Feasibility: real chance of adoption in a real context | 20  |
+| Fit with the track theme                               | 15  |
+| Quality of the pitch, including the live demo          | 15  |
 
 Finalists are selected on everything except the pitch. Ties are broken by
 execution, then innovation. Jury: 5 people, 1 from the sponsor, 1 from GDG

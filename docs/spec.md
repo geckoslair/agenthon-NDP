@@ -40,7 +40,7 @@ Raw input: a folder of invoice PDFs for the month, the card or bank charges
 Finished output: the approved package and email, an updated supplier
 registry, and the log.
 
-## Unknown supplier research **[decided, one point open]**
+## Unknown supplier research **[decided]**
 
 Facts to establish, each with its source and a quoted snippet:
 
@@ -57,25 +57,28 @@ billing docs, VAT FAQ), VIES, then asking the supplier or the accountant.
 A fact with no source is "unknown". The agent never infers it. If facts
 are still unknown after research, the invoice becomes an exception.
 
-**Open:** whether emails to the supplier or the accountant are sent
-autonomously or wait for approval. The brief says the autopilot "waits for
-approval before anything is sent". Proposed: web research is autonomous
-(read-only); every outgoing email is drafted and waits for one click.
+**Outgoing emails [decided]:** web research is autonomous (read-only).
+Every email to a supplier or to the accountant is drafted and waits for a
+person's approval. A person can then switch a **predefined template** to
+unattended sending; from then on emails from that template go out without
+a click, and the log records who enabled it. This is off by default, can be
+revoked, and never applies to the monthly package or to free-text emails.
+Implemented in `src/lib/audit.ts` (`queueOutgoing`, `setAutoSend`).
 
 ## Exceptions that stop an invoice **[proposed]**
 
 All taken from real episodes in `docs/domain.md`.
 
-| Exception | Rule |
-| --- | --- |
-| Expected invoice missing | Recurring supplier in the registry, or a card charge, with no invoice this month |
-| Addressed to a person | Addressee or VAT number is not the company's |
-| Foreign VAT charged | VAT amount greater than zero on a foreign invoice |
-| Wrong month | Invoice date outside the month of the run |
-| Not foreign | Supplier country is Italy |
-| Duplicate | Same supplier, number and amount, or receipt plus invoice for one charge |
-| Supplier facts unknown | Research did not establish the required facts |
-| Out of known rules | For example a private individual outside the EU: "I don't know, a person decides" |
+| Exception                | Rule                                                                              |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| Expected invoice missing | Recurring supplier in the registry, or a card charge, with no invoice this month  |
+| Addressed to a person    | Addressee or VAT number is not the company's                                      |
+| Foreign VAT charged      | VAT amount greater than zero on a foreign invoice                                 |
+| Wrong month              | Invoice date outside the month of the run                                         |
+| Not foreign              | Supplier country is Italy                                                         |
+| Duplicate                | Same supplier, number and amount, or receipt plus invoice for one charge          |
+| Supplier facts unknown   | Research did not establish the required facts                                     |
+| Out of known rules       | For example a private individual outside the EU: "I don't know, a person decides" |
 
 Each exception shows the evidence, a proposed action, and waits for a
 person. Resolving it is logged with who decided.
@@ -83,7 +86,8 @@ person. Resolving it is logged with who decided.
 ## Human approval points **[decided in principle]**
 
 - Sending the package to the accountant.
-- Any outgoing email (see the open point above).
+- Any outgoing email, unless a person enabled unattended sending for its
+  template.
 - Adding or changing a supplier in the registry. **[proposed]**
 
 ## Audit log **[decided]**
@@ -106,7 +110,7 @@ missing, which exceptions wait for a decision. Approval stays a click, not
 a voice command. Stretch: a conversational agent that answers "why is this
 invoice blocked?" from the log.
 
-## Stack **[proposed]**
+## Stack **[decided]**
 
 Next.js (TypeScript) with SQLite, run locally for the demo. Gemini on
 Vertex AI (`gemini-3.8-flash`) for extraction and research. A backup video

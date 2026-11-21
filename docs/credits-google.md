@@ -31,16 +31,16 @@ development.
 
 ## Models and prices
 
-| Use | Model id | Price | 30 USD buys |
-| --- | --- | --- | --- |
-| Text | `gemini-3.8-flash` | 0.75 USD/M tokens in, 3.75 out (until 31 Dec). Thinking counts as output | ~5,700 calls of 2,000 in / 1,000 out |
-| Image | `gemini-3.1-flash-lite-image` (Nano Banana 2 Lite) | 0.034 USD/image | ~880 images |
-| Image | `gemini-3.1-flash-image` (Nano Banana 2) | 0.067 USD/image at 1K | ~450 images |
-| Image | `gemini-3-pro-image` (Nano Banana Pro) | ~0.13 USD/image at 1K | ~220 images |
-| Video | `veo-3.1-generate-001` with audio | 0.40 USD/second | ~75 seconds |
-| Video | `veo-3.1-generate-001` without audio | 0.20 USD/second | ~150 seconds |
-| Video | `veo-3.1-fast-generate-001` with audio | 0.10 USD/second at 720p | ~300 seconds |
-| Video | `veo-3.1-lite-generate-001` (Preview, coverage unconfirmed) | 0.05 USD/second at 720p | ~600 seconds |
+| Use   | Model id                                                    | Price                                                                    | 30 USD buys                          |
+| ----- | ----------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------ |
+| Text  | `gemini-3.8-flash`                                          | 0.75 USD/M tokens in, 3.75 out (until 31 Dec). Thinking counts as output | ~5,700 calls of 2,000 in / 1,000 out |
+| Image | `gemini-3.1-flash-lite-image` (Nano Banana 2 Lite)          | 0.034 USD/image                                                          | ~880 images                          |
+| Image | `gemini-3.1-flash-image` (Nano Banana 2)                    | 0.067 USD/image at 1K                                                    | ~450 images                          |
+| Image | `gemini-3-pro-image` (Nano Banana Pro)                      | ~0.13 USD/image at 1K                                                    | ~220 images                          |
+| Video | `veo-3.1-generate-001` with audio                           | 0.40 USD/second                                                          | ~75 seconds                          |
+| Video | `veo-3.1-generate-001` without audio                        | 0.20 USD/second                                                          | ~150 seconds                         |
+| Video | `veo-3.1-fast-generate-001` with audio                      | 0.10 USD/second at 720p                                                  | ~300 seconds                         |
+| Video | `veo-3.1-lite-generate-001` (Preview, coverage unconfirmed) | 0.05 USD/second at 720p                                                  | ~600 seconds                         |
 
 Other GA text models named by the portal as fine: `gemini-3.5-flash`,
 `gemini-3.1-flash-lite`.

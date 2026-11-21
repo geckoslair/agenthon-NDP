@@ -14,15 +14,22 @@ approval. Every step is logged.
 
 ## Technologies
 
-TypeScript on Node 20. Gemini on Vertex AI. ElevenLabs.
+Next.js 16 and TypeScript on Node 20, SQLite, Gemini on Vertex AI,
+ElevenLabs, Vitest.
 
 ## Getting started
 
+Requirements: Node 20 or later, and the gcloud CLI for Gemini.
+
 ```sh
-cp .env.example .env   # then fill in your own values
+npm install
+cp .env.example .env              # then fill in your own values
+gcloud auth application-default login
+npm run dev                       # http://localhost:3000
+npm test
 ```
 
-Run instructions will be added with the application scaffold.
+The SQLite database is created on first use in `data/app.db`.
 
 ## For contributors and coding agents
 
