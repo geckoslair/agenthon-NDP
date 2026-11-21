@@ -15,15 +15,15 @@ commit at 17:00; anything pushed later does not count.
 
 ## Read these first
 
-| File                         | Content                                                             |
-| ---------------------------- | ------------------------------------------------------------------- |
-| `docs/brief.md`              | The challenge, verbatim, and what the jury checks                   |
-| `docs/event.md`              | Schedule, submission fields, judging weights, rules that bind us    |
-| `docs/credits-google.md`     | Vertex AI credits: models, prices, limits, what is not covered      |
-| `docs/credits-elevenlabs.md` | ElevenLabs credits and the special prize                            |
-| `docs/domain.md`             | The real-world process, volumes and recurring problems (anonymised) |
-| `docs/spec.md`               | What we are building: the run, exceptions, approvals, demo data     |
-| `docs/decisions.md`          | Decisions taken so far and open questions                           |
+| File                         | Content                                                                  |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| `docs/brief.md`              | The challenge, verbatim, and what the jury checks                        |
+| `docs/event.md`              | Schedule, submission fields, judging weights, rules that bind us         |
+| `docs/credits-google.md`     | Vertex AI credits: models, prices, limits, what is not covered           |
+| `docs/credits-elevenlabs.md` | ElevenLabs credits and the special prize                                 |
+| `docs/domain.md`             | An illustrative scenario: process, estimated volumes, recurring problems |
+| `docs/spec.md`               | What we are building: the run, exceptions, approvals, demo data          |
+| `docs/decisions.md`          | Decisions taken so far and open questions                                |
 
 ## Product
 

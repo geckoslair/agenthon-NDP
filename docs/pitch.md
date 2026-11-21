@@ -1,9 +1,9 @@
 # Pitch material
 
-Numbers below come only from [`docs/domain.md`](domain.md), the anonymised
-summary of the real case: the studio's own time tracking over 25 months
-(November 2024 to November 2026) and its email history. Nothing else is
-quoted. Tax rules are as reported by the accountant, not verified.
+Numbers below come only from [`docs/domain.md`](domain.md), an illustrative
+scenario with figures estimated by the team. They are estimates, not
+measurements, and no real client data is used. Tax rules are as commonly
+reported by accountants, not verified.
 
 ## (a) Submission description (as saved on the portal at 15:33)
 
@@ -27,16 +27,15 @@ esteri, quasi tutti abbonamenti SaaS pagati con carta. Queste fatture non
 passano dallo SdI: qualcuno le raccoglie a mano, una per una, e le consegna
 al commercialista, che le integra e le invia entro il 15.
 
-Abbiamo misurato un caso reale, anonimizzato, su 25 mesi di tracciamento del
-tempo. Lo diciamo senza giri di parole: il costo diretto è basso, circa 0,8
-ore al mese di voci dedicate, al massimo 2,5 contando per intero ogni voce
-mista. Per uno studio sono 10-30 ore l'anno.
+Abbiamo stimato il caso di uno studio tipo. Lo diciamo senza giri di parole:
+il costo diretto è basso, fra una e due ore e mezza al mese. Per uno studio
+sono 10-30 ore l'anno.
 
 Il problema non è il tempo. Sono gli errori che saltano fuori vicino alla
 scadenza: una fattura mancante, intestata a un socio, con IVA estera
-addebitata. In 23 mesi, circa 39 conversazioni email sul tema. Poi la
-dipendenza da una sola persona. E la scala: 44 fornitori in 22 mesi, in
-media 1,6 nuovi al mese. Non è un problema solo di questo studio."
+addebitata. In due anni, qualche decina di scambi di email sul tema. Poi la
+dipendenza da una sola persona. E la scala: una quarantina di fornitori
+esteri in due anni, uno o due nuovi al mese. Non è un problema solo di questo studio."
 
 **Soluzione (0:30 – 1:00)**
 
@@ -65,7 +64,7 @@ la trasmetto. Nel registro c'è chi ha deciso cosa, e quando."
 allo SdI e la consegna al gestionale sono simulati, e le bozze di
 autofattura non sono validate fiscalmente: lo scriviamo anche
 nell'interfaccia. Il caso non si regge sul tempo risparmiato da un singolo
-studio, che abbiamo misurato ed è basso, ma sugli errori trovati prima della
+studio, che abbiamo stimato ed è basso, ma sugli errori trovati prima della
 scadenza e su un processo che non dipende più da una persona. Probata fa il
 lavoro, e chiede prima."
 
@@ -84,7 +83,7 @@ lavoro, e chiede prima."
   fatture"; chi lo fa resta nel registro.
 - "Chi approva è autenticato?": no. L'utente in alto è dimostrativo e
   l'intestazione lo dice ("accesso simulato"): nel prototipo non c'è login.
-- "Quanto si risparmia?": per uno studio poco, 10–30 ore l'anno misurate.
+- "Quanto si risparmia?": per uno studio poco, 10–30 ore l'anno stimate.
   Non abbiamo dati di mercato e non li inventiamo.
 - "E le fatture in dollari?": si fermano e chiedono il controvalore in euro
   a una persona. Non inventiamo un cambio.

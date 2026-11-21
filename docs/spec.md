@@ -14,7 +14,7 @@ nothing without a person's approval. **[decided]**
 
 Small Italian software houses and SMEs that buy software and services from
 foreign suppliers and hand the invoices to an external accountant every
-month. See `docs/domain.md` for the real case behind it.
+month. See `docs/domain.md` for the scenario behind it.
 
 ## The monthly run **[decided]**
 

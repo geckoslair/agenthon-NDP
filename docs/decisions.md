@@ -11,7 +11,7 @@ it is not decided; ask the humans.
 | Domain                       | Italian software houses buying from foreign suppliers (passive foreign invoicing)                                                                                                                                      |
 | Process                      | The monthly package of foreign purchase invoices for the accountant, run end to end. Full spec in `docs/spec.md`                                                                                                       |
 | Unknown suppliers            | When the run meets a supplier with no billing data on file, the agent does not stop: it researches the data on the web and by asking the supplier or the accountant. It raises an exception only if it cannot get them |
-| Role of the real case        | The studio in `docs/domain.md` is evidence of the problem. Demo data is synthetic                                                                                                                                      |
+| Role of the scenario         | The scenario in `docs/domain.md` illustrates the problem. Demo data is synthetic                                                                                                                                       |
 | Long-term vision (not today) | Supplier selection at the quoting stage, self-invoice XML and SdI, split across cost centres                                                                                                                           |
 | Stack                        | TypeScript, Node 20, one full-stack app, Prettier, Vitest                                                                                                                                                              |
 | Git                          | Commit straight to `main`, no PRs, quick and dirty                                                                                                                                                                     |
@@ -72,7 +72,7 @@ it is not decided; ask the humans.
 ## Open
 
 - Where ElevenLabs fits in the product.
-- How to frame the business case: the measured cost for one studio is low
+- How to frame the business case: the estimated cost for one studio is low
   (see `docs/domain.md`).
 
 ## Domain facts

@@ -1,13 +1,15 @@
 # Domain context: foreign purchase invoices in a small software house
 
-Anonymised summary of a real case: a small Italian web studio and its
-external accountant, observed over 22 months. People, the studio and the
-accountant are not named on purpose: **this repository is public and the
-brief forbids real client or personal data.** Never add names, emails,
-amounts tied to a person, or real invoices here or in the test data.
+An illustrative scenario: an estimate of how a typical small Italian web
+studio and its external accountant handle foreign purchase invoices, based
+on the team's own working experience. **It is not client data and it names
+no real person or company: this repository is public and the brief forbids
+real client or personal data.** Never add names, emails, amounts tied to a
+person, or real invoices here or in the test data. All figures below are
+estimates, not measurements.
 
-Tax rules below are **as reported by the accountant in emails**. They are
-not verified against official sources. Verify before coding them as rules.
+Tax rules below are **as commonly reported by accountants**. They are not
+verified against official sources. Verify before coding them as rules.
 
 ## The situation
 
@@ -50,14 +52,14 @@ the charge date or the receipt date.
   without foreign VAT charged (reverse charge). Otherwise the supplier must
   cancel and reissue it.
 
-## Volumes
+## Volumes (estimated)
 
-- 6 to 13 invoices a month in the first year, 13 to 26 in the second.
-- Peaks come from a single supplier issuing up to 13 invoices in a month.
-- 44 distinct suppliers in 22 months: 16 recurring, 28 occasional or
-  one-off (many are annual renewals).
-- About 1.6 new suppliers a month, with peaks of 4 to 5. Three recurring
-  suppliers disappeared in the second year.
+- Around 10 invoices a month at first, 15 to 25 a month as the studio adopts
+  more services.
+- Peaks come from a single supplier issuing many invoices in a month.
+- About forty distinct suppliers over two years: under half recurring, the
+  rest occasional or one-off (many are annual renewals).
+- One or two new suppliers a month.
 
 ## Recurring problems (each one is a candidate exception)
 
@@ -75,21 +77,17 @@ the charge date or the receipt date.
 | 10  | Two documents for one purchase (receipt plus invoice, or a reissued invoice)                      | No deduplication                                                        |
 | 11  | Supplier is a private individual outside the EU, or an exempt freelancer without an EU VAT number | Rare case with no known rule                                            |
 
-## Measured cost
+## Estimated cost
 
-From the studio's own time tracking over 25 months (November 2024 to
-November 2026):
+Order of magnitude for one small studio, estimated by the team:
 
-- **About 0.8 hours a month** in entries dedicated only to foreign
-  invoices (30 entries, 20 hours in total).
-- **Up to 2.5 hours a month** if every mixed entry that mentions foreign
-  invoices among other admin tasks is counted in full (43 more entries, 41
-  hours). This is an upper bound.
-- About 39 email threads on the topic in 23 months, plus occasional 15 to
-  30 minute calls.
-- Penalties paid: a handful of late invoices at 2 EUR each.
+- **About 1 to 2.5 hours a month** spent collecting and checking foreign
+  invoices and answering the accountant's questions.
+- A few dozen email exchanges on the topic over two years, plus occasional
+  15 to 30 minute calls.
+- Penalties: a handful of late invoices at 2 EUR each.
 
-Not measured: the accountant's time, and time that nobody tracked.
+Not estimated: the accountant's time.
 
 **Read this honestly: for one small studio the direct cost is low**, 10 to
 30 hours a year. The business case cannot rest on this number alone. It
