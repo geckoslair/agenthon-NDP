@@ -75,9 +75,26 @@ the charge date or the receipt date.
 | 10 | Two documents for one purchase (receipt plus invoice, or a reissued invoice) | No deduplication |
 | 11 | Supplier is a private individual outside the EU, or an exempt freelancer without an EU VAT number | Rare case with no known rule |
 
-Penalties actually paid are small (a handful of late invoices at 2 EUR
-each). **The real cost is the time spent** collecting, chasing and
-exchanging emails, and the risk of errors nobody catches.
+## Measured cost
+
+From the studio's own time tracking over 25 months (November 2024 to
+November 2026):
+
+- **About 0.8 hours a month** in entries dedicated only to foreign
+  invoices (30 entries, 20 hours in total).
+- **Up to 2.5 hours a month** if every mixed entry that mentions foreign
+  invoices among other admin tasks is counted in full (43 more entries, 41
+  hours). This is an upper bound.
+- About 39 email threads on the topic in 23 months, plus occasional 15 to
+  30 minute calls.
+- Penalties paid: a handful of late invoices at 2 EUR each.
+
+Not measured: the accountant's time, and time that nobody tracked.
+
+**Read this honestly: for one small studio the direct cost is low**, 10 to
+30 hours a year. The business case cannot rest on this number alone. It
+must rest on scale (how many companies share the problem), on the errors
+that surface months later, and on dependence on single people.
 
 ## What is missing today
 
