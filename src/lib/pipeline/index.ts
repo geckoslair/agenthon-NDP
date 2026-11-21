@@ -215,6 +215,11 @@ export async function runMonth(
 
   // Inputs: company, registry, charges.
   const company = readJson<CompanyProfile>(path.join(monthDir, "company.json"));
+  // Kept with the run so later checks (manual completion) use the same company profile.
+  db.prepare(
+    `INSERT INTO settings (key, value, updated_by) VALUES (?, ?, 'autopilot')
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = datetime('now')`,
+  ).run(`run_company:${runId}`, JSON.stringify(company));
   const sourcesFile = path.join(monthDir, "sources.json");
   const sourcesConfig: SourcesConfig = fs.existsSync(sourcesFile) ? readJson(sourcesFile) : {};
   const suppliersFile = path.join(monthDir, "suppliers.json");
@@ -725,3 +730,5 @@ export {
   type DeliveryMode,
   type PackageBlocker,
 } from "./delivery";
+
+export { completeUnreadableFields, unreadableFields, MANUAL_FIELDS } from "./manual-fields";
