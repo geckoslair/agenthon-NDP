@@ -1,0 +1,70 @@
+# AGENTS.md
+
+Single source of truth for every coding agent working in this repository
+(`CLAUDE.md` only imports this file). Read it fully before doing anything.
+
+## What this is
+
+Team Cicconi's project for **AGENTHON** (GDG Torino hackathon, Saturday
+21 November 2026), Track 1 "Agentic AI for business", **Challenge B · Back
+Office Autopilot**. Team: Enrico Cicconi, Alberto Angeli, plus a third person
+being onboarded.
+
+**Hard deadline: 17:00 today.** The portal records the repository's latest
+commit at 17:00; anything pushed later does not count.
+
+## Read these first
+
+| File | Content |
+| --- | --- |
+| `docs/brief.md` | The challenge, verbatim, and what the jury checks |
+| `docs/event.md` | Schedule, submission fields, judging weights, rules that bind us |
+| `docs/credits-google.md` | Vertex AI credits: models, prices, limits, what is not covered |
+| `docs/credits-elevenlabs.md` | ElevenLabs credits and the special prize |
+| `docs/decisions.md` | Decisions taken so far and open questions |
+
+## Product direction (in progress)
+
+Passive foreign invoicing for Italian SMEs that buy from foreign suppliers.
+The exact process is still being chosen, see `docs/decisions.md`. Do not
+invent scope: if something is not decided there, ask the humans.
+
+## What wins (from the brief)
+
+"Flashy demos don't win here. The winner is the build that is right, admits
+what it doesn't know, and never acts without a person's approval." The jury
+and rival teams will try to break it live. So:
+
+- Deterministic rules decide; the LLM extracts, classifies and explains.
+- Every exception stops the run and waits for a person.
+- Nothing is sent, paid or exported without an explicit human approval.
+- Every step is written to an audit log: what, on which input, who approved.
+- When the data does not support an answer, say "I don't know".
+
+## Working rules
+
+- **Quick and dirty, but demoable.** It is a hackathon: no PRs, no `develop`,
+  commit straight to `main`, push often, small commits.
+- Pull with rebase before pushing (`git pull --rebase`). Three people push to
+  the same branch.
+- Keep `main` runnable at all times. A broken `main` at 17:00 is what the
+  jury gets.
+- **The repository is public.** Never commit secrets, API keys, emails or
+  personal data. Secrets live in `.env` (git-ignored); `.env.example` lists
+  the variable names.
+- **No real client or personal data** (brief rule). Use synthetic data in
+  real formats, or an open-source dataset.
+- Code, identifiers, comments, commit messages and docs are in English.
+  UI text may be Italian if the product is Italian.
+- Stack: TypeScript on Node 20, one full-stack app, Prettier, Vitest.
+- Never invent APIs, model ids, SDK methods or prices. Model ids and prices
+  come from `docs/credits-google.md`; check SDK usage against current docs.
+- Any pre-existing component used must be declared in the submission
+  description (event rules, art. 7.3). Note it in `docs/decisions.md`.
+
+## Paid services: project use only
+
+The Google Cloud and ElevenLabs credits pay for what **the product does at
+runtime** (and for the pitch material), not for developing it. Do not call
+Gemini, Veo, Nano Banana or ElevenLabs as a coding aid, and keep test calls
+small. Each team member uses their own credits, project and key.

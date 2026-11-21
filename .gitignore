@@ -1,0 +1,18 @@
+# secrets: this repository is PUBLIC
+.env
+.env.*
+!.env.example
+*.key
+*credentials*.json
+
+# dependencies and build output
+node_modules/
+dist/
+.next/
+coverage/
+
+# local tooling
+.tokensave/
+.claude/settings.json
+.claude/settings.local.json
+.DS_Store
