@@ -31,7 +31,7 @@ it is not decided; ask the humans.
 
 ## Domain facts
 
-None verified yet. Tax rules (document types, deadlines, thresholds) must be
+See `docs/domain.md`. None verified yet. Tax rules (document types, deadlines, thresholds) must be
 checked against Agenzia delle Entrate sources before they are coded as
 rules, and each rule must cite its source here.
 
