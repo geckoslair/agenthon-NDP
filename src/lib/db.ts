@@ -118,6 +118,16 @@ BEGIN SELECT RAISE(ABORT, 'audit_log is append-only'); END;
 
 export type Db = Database.Database;
 
+/** Adds columns introduced after a database file was first created. */
+function migrate(db: Db): void {
+  const columns = (db.prepare("PRAGMA table_info(invoices)").all() as { name: string }[]).map(
+    (c) => c.name,
+  );
+  for (const column of ["source", "origin"]) {
+    if (!columns.includes(column)) db.exec(`ALTER TABLE invoices ADD COLUMN ${column} TEXT`);
+  }
+}
+
 /** Opens (and creates if needed) a database. Pass ":memory:" in tests. */
 export function openDb(file: string): Db {
   if (file !== ":memory:") fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -125,6 +135,7 @@ export function openDb(file: string): Db {
   db.pragma("journal_mode = WAL");
   db.pragma("foreign_keys = ON");
   db.exec(SCHEMA);
+  migrate(db);
   return db;
 }
 
