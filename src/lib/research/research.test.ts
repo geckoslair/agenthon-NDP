@@ -3,6 +3,7 @@ import { openDb } from "../db";
 import {
   factsFromInvoice,
   missingFacts,
+  negativeFacts,
   parseBillingInfo,
   REQUIRED_FACTS,
   researchSupplier,
@@ -120,5 +121,21 @@ describe("supplierRequestEmail", () => {
     expect(mail.subject).toBe("Acme | Richiesta dati di fatturazione");
     expect(mail.body).toContain("1. fattura senza IVA estera");
     expect(mail.body).not.toContain("2.");
+  });
+});
+
+describe("negativeFacts", () => {
+  it("keeps only 'no' for reverse_charge and company_addressee", () => {
+    const f = (fact: string, value: string) =>
+      ({ fact, value, sourceUrl: "u", quote: "q" }) as Parameters<typeof negativeFacts>[0][number];
+    expect(
+      negativeFacts([
+        f("reverse_charge", "No"),
+        f("company_addressee", "yes"),
+        f("currency", "no"),
+        f("company_addressee", "no"),
+      ]).map((x) => x.fact),
+    ).toEqual(["reverse_charge", "company_addressee"]);
+    expect(negativeFacts([])).toEqual([]);
   });
 });

@@ -114,6 +114,32 @@ export function mergeFacts(...lists: Fact[][]): Fact[] {
   return [...out.values()];
 }
 
+/**
+ * Known facts that say the supplier does not fit: it charges foreign VAT, or it only
+ * invoices the person. They are established facts, so they raise an exception.
+ */
+export const NEGATIVE_FACT_RULES = {
+  reverse_charge: {
+    code: "FOREIGN_VAT_CHARGED" as const,
+    message: "La pagina pubblica del fornitore dice che addebita l'IVA locale.",
+    action:
+      "Verificare con il fornitore se, inserendo la partita IVA della società, fattura in reverse charge; altrimenti decidere con il commercialista se procedere.",
+  },
+  company_addressee: {
+    code: "ADDRESSED_TO_PERSON" as const,
+    message: "La pagina pubblica del fornitore dice che fattura solo alla persona che acquista.",
+    action:
+      "Chiedere al fornitore se può intestare la fattura alla società; altrimenti decidere con il commercialista se procedere.",
+  },
+};
+
+/** Facts found with value "no" for reverse_charge or company_addressee. */
+export function negativeFacts(facts: Fact[]): Fact[] {
+  return facts.filter(
+    (f) => f.fact in NEGATIVE_FACT_RULES && f.value.trim().toLowerCase() === "no",
+  );
+}
+
 export function missingFacts(facts: Fact[]): FactName[] {
   const known = new Set(facts.map((f) => f.fact));
   return REQUIRED_FACTS.filter((f) => !known.has(f));

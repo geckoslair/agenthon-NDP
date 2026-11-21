@@ -19,8 +19,17 @@ import { createEmailSource } from "../sources/email";
 import { createBillingApiSource } from "../sources/billing-api";
 import { createBrowserSource } from "../sources/browser";
 import { supplierIdFromFileName } from "../sources/fs-util";
-import { FACT_LABELS, researchSupplier, storeFacts, supplierRequestEmail } from "../research";
-import { accountantEmail, buildSummaryEmail, buildZip, type PackageEntry } from "../package";
+import {
+  type Fact,
+  FACT_LABELS,
+  NEGATIVE_FACT_RULES,
+  negativeFacts,
+  researchSupplier,
+  storeFacts,
+  supplierRequestEmail,
+} from "../research";
+import { accountantEmail } from "../package";
+import { buildPackage, collectedDir, refreshPackage } from "./repackage";
 import { EU_COUNTRIES, EXCEPTION_TEXT } from "./messages";
 import { parseCharges } from "./charges";
 
@@ -227,7 +236,7 @@ export async function runMonth(
   log("charges_loaded", null, `${charges.length} addebiti carta`, chargesFile);
 
   // 1. Collect, channel by channel; later channels only for files still missing.
-  const outDir = path.join(dataDir, "collected", month, `run-${runId}`);
+  const outDir = collectedDir(dataDir, month, runId);
   const collected = new Map<string, CollectedDocument>();
   const isMissing = (fileName: string) => !collected.has(fileName);
   const kinds = options.sources ?? enabledSources();
@@ -325,6 +334,7 @@ export async function runMonth(
     supplierId: string | null,
     evidence: string | null,
     extraMessage?: string,
+    action?: string,
   ) => {
     if (invoice) {
       if (invoice.codes.has(code)) return;
@@ -340,7 +350,7 @@ export async function runMonth(
         code,
         message,
         evidence,
-        text.action,
+        action ?? text.action,
       ).lastInsertRowid,
     );
     log(
@@ -402,6 +412,8 @@ export async function runMonth(
 
   // 4. Unknown suppliers: research, never stop the run.
   const researched = new Set<string>();
+  /** Known facts that say the supplier does not fit, per supplier id. */
+  const negatives = new Map<string, Fact[]>();
   for (const item of items) {
     if (item.supplier && item.supplier.status === "approved") continue;
     if (!item.extracted) continue;
@@ -474,12 +486,37 @@ export async function runMonth(
         `Non trovati: ${labels}`,
         `Dati sconosciuti: ${labels}.`,
       );
-    } else {
+    }
+    const unfit = negativeFacts(result.facts);
+    if (unfit.length > 0) {
+      negatives.set(id, unfit);
+      log(
+        "supplier_not_fitting",
+        `supplier:${id}`,
+        unfit.map((f) => `${f.fact} = ${f.value} | "${f.quote}"`).join("; "),
+        result.pageUrl,
+      );
+    } else if (result.missing.length === 0) {
       log(
         "supplier_proposed",
         `supplier:${id}`,
         `Tutti i dati trovati con fonte: propongo ${name} in anagrafica (stato "unknown", da approvare)`,
         result.pageUrl,
+      );
+    }
+  }
+
+  // A known "no" is a fact, not a gap: it blocks every invoice of that supplier.
+  for (const item of items) {
+    for (const f of (item.supplierId && negatives.get(item.supplierId)) || []) {
+      const rule = NEGATIVE_FACT_RULES[f.fact as keyof typeof NEGATIVE_FACT_RULES];
+      raise(
+        rule.code,
+        item,
+        item.supplierId,
+        `"${f.quote}" (${f.sourceUrl})`,
+        rule.message,
+        rule.action,
       );
     }
   }
@@ -527,43 +564,13 @@ export async function runMonth(
   for (const item of items) setStatus.run(item.codes.size > 0 ? "exception" : "ok", item.invoiceId);
 
   // 6. Package: valid PDFs only; invoices with open exceptions are listed as pending.
-  const nameOf = (item: WorkItem) => {
-    const id = item.supplierId;
-    const s = id ? loadSuppliers(db).find((x) => x.id === id) : null;
-    return s?.name ?? item.extracted?.supplierName.value ?? item.doc.fileName;
-  };
-  const entries = new Map<string, PackageEntry>();
-  const entry = (name: string) => {
-    const e = entries.get(name) ?? {
-      supplierName: name,
-      included: 0,
-      pending: 0,
-      toReceive: false,
-    };
-    entries.set(name, e);
-    return e;
-  };
-  const valid = items.filter((i) => i.codes.size === 0);
-  for (const item of items) {
-    if (item.codes.has("DUPLICATE")) continue;
-    const e = entry(nameOf(item));
-    if (item.codes.size === 0) e.included += 1;
-    else e.pending += 1;
-  }
-  for (const id of missingSuppliers) {
-    const s = registry.find((x) => x.id === id);
-    if (s) entry(s.name).toReceive = true;
-  }
-  const zipPath = path.join(dataDir, "packages", `${month}-run-${runId}.zip`);
-  await buildZip(
-    valid.map((i) => ({ path: i.doc.path, name: i.doc.fileName })),
-    zipPath,
-  );
-  const email = buildSummaryEmail(company.legalName, month, [...entries.values()]);
+  const pkg = buildPackage(db, runId, month, company.legalName, dataDir);
+  const email = pkg;
+  const zipPath = pkg.zipPath;
   log(
     "package_built",
     `run:${runId}`,
-    `${email.total} fatture nello zip, ${items.length - valid.length} in sospeso`,
+    `${pkg.total} fatture nello zip, ${pkg.pending} in sospeso`,
     zipPath,
   );
   queueOutgoing(db, {
@@ -622,6 +629,7 @@ export function resolveException(
     subject: `exception:${exceptionId}`,
     detail: `${row.code}: ${resolution}`,
   });
+  let packageChanged = false;
   if (row.invoice_id !== null) {
     const open = (
       db
@@ -629,16 +637,35 @@ export function resolveException(
         .get(row.invoice_id) as { n: number }
     ).n;
     if (open === 0) {
-      db.prepare("UPDATE invoices SET status = 'ok' WHERE id = ?").run(row.invoice_id);
+      // A resolved duplicate or Italian invoice stays out of the foreign package.
+      const exclude = (
+        db
+          .prepare(
+            "SELECT COUNT(*) AS n FROM exceptions WHERE invoice_id = ? AND code IN ('DUPLICATE','NOT_FOREIGN')",
+          )
+          .get(row.invoice_id) as { n: number }
+      ).n;
+      db.prepare("UPDATE invoices SET status = ? WHERE id = ?").run(
+        exclude > 0 ? "excluded" : "ok",
+        row.invoice_id,
+      );
       logStep(db, {
         runId: row.run_id,
         actor: person,
         step: "invoice_cleared",
         subject: `invoice:${row.invoice_id}`,
-        detail: "Nessuna eccezione aperta: fattura di nuovo valida",
+        detail:
+          exclude > 0
+            ? "Nessuna eccezione aperta: fattura esclusa dal pacchetto"
+            : "Nessuna eccezione aperta: fattura di nuovo valida",
       });
+      packageChanged = true;
     }
+  } else {
+    packageChanged = true;
   }
+  // The package visibly follows the person's decision, while it still waits for approval.
+  if (packageChanged) refreshPackage(db, row.run_id, person);
   return true;
 }
 
