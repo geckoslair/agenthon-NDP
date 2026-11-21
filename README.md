@@ -54,6 +54,7 @@ know, a person decides"). See [`docs/spec.md`](docs/spec.md).
 - SQLite via better-sqlite3 (suppliers, runs, invoices, exceptions, outbox,
   audit log)
 - Gemini on Vertex AI (`@google/genai`) for live invoice extraction, optional
+- ElevenLabs text to speech (`@elevenlabs/elevenlabs-js`, model `eleven_flash_v2_5`) for the spoken brief
 - Playwright (browser collection channel), mailparser (email channel),
   archiver (package zip), zod
 - pdfkit (generates the synthetic demo invoices), Vitest, Prettier, ESLint
@@ -79,6 +80,17 @@ app, the tests and the demo run **without any API key and without any model
 call**. Live extraction with Gemini is opt-in: set `EXTRACTOR=gemini` and the
 Google variables in `.env`, and log in with
 `gcloud auth application-default login`.
+
+## Spoken brief (ElevenLabs)
+
+The overview has a card "Brief del giro": the text is built from the database
+(counts per channel, ready invoices, each open exception, what is missing,
+what waits for approval) and the button **Ascolta il brief** reads it aloud.
+It only reads: it approves and sends nothing. Set `ELEVENLABS_API_KEY` in
+`.env`; optional `ELEVENLABS_VOICE_ID` and `ELEVENLABS_MODEL`. Without a key
+the route `/api/brief/audio` answers 503 and the card shows the text only.
+Audio is cached in `data/voice/` (git-ignored) by a hash of the text, so
+repeating the same brief costs nothing.
 
 ## Run the demo month
 
@@ -124,7 +136,7 @@ Not built:
 - The self-invoice XML and the submission to SdI (the autopilot prepares the
   package for the accountant, who does that step).
 - Real mailbox, bank or supplier connections.
-- The ElevenLabs voice brief (the SDK is a dependency, nothing uses it yet).
+- Voice input or voice approvals. The spoken brief is output only: approvals stay a click.
 - Live VIES validation of tax ids. The tax rules in
   [`docs/domain.md`](docs/domain.md) are as reported by an accountant and are
   not verified against official sources.
