@@ -49,6 +49,23 @@ charged, wrong month, not a foreign supplier, duplicate, supplier facts
 unknown, unreadable field, and cases outside the known rules ("I don't
 know, a person decides"). See [`docs/spec.md`](docs/spec.md).
 
+## What the model does, and what was measured
+
+Extraction is done by Gemini 3.8 Flash on Vertex AI: it reads each PDF and
+returns every field with the verbatim quote and page. Rules written in code
+then decide; the model never does.
+
+Measured on 21 November 2026 on the demo month: with live Gemini extraction
+(`EXTRACTOR=gemini`) the run over the 18 PDFs raised **exactly the 9
+exceptions listed in `demo/2026-10/expected.json`**, in 172 seconds
+(sequential calls). One run, one dataset: it is a check, not a benchmark.
+
+Because that is too slow to click through in a three-minute pitch, the
+hosted demo and the tests replay the stored extraction in
+`demo/2026-10/truth/` (written by the data generator, not by the model).
+Unknown-supplier research in the demo parses tagged fields from the fake
+supplier pages; it does not use a model.
+
 ## Technologies
 
 - Next.js 16 (App Router), React 19, TypeScript, Node 20, Tailwind CSS,
